@@ -1,0 +1,9 @@
+from django.urls import path
+
+from .views import user_views
+
+urlpatterns = [
+    # 로그인
+    path('', user_views.user_login),
+    path('user/login', user_views.user_login, name="user_login"),
+]
