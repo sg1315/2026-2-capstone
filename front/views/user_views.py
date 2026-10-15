@@ -36,4 +36,4 @@ def user_login(request):
             messages.error(request, '아이디 또는 비밀번호가 올바르지 않습니다.')
             return redirect('user_login')
 
-    return render(request, 'user_login.html')
+    return render(request, 'user/user_login.html')
