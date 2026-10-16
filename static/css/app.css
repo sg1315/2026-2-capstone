@@ -1,3 +1,32 @@
-:root {
-    
+/* logo 폰트 */
+@font-face {
+    font-family: 'Paperozi';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/2408-3@1.0/Paperlogy-5Medium.woff2') format('woff2');
+    font-weight: 500;
+    font-display: swap;
+}
+
+/* 로그인 및 로그아웃 폰트 */
+@font-face {
+    font-family: 'BithumbGothicOriginal';
+    src: url('https://cdn.jsdelivr.net/gh/Project-Noonnu/2610082345@original/original/Bithumb Gothic Original.woff2') format('woff2');
+    font-weight: 700;
+    font-display: swap;
+}
+
+/* footer 메뉴 폰트 */
+@font-face {
+    font-family: 'NanumSquareRound';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_two@1.0/NanumSquareRound.woff') format('woff');
+    font-weight: normal;
+    font-display: swap;
+}
+
+body {
+    margin : 0;
+}
+
+a {
+    text-decoration: none;
+    color: black;
 }
