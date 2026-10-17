@@ -17,18 +17,18 @@ header {
 }
 
 /* 로고 */
-.logo {
+.header-logo {
     display: flex;
     align-items: center;
     flex-shrink: 0;
 }
-.logo img {
+.header-logo img {
     width: 30px;
     height: 30px;
     object-fit: contain;
     margin-right: 3px;
 }
-.logo span {
+.header-logo span {
     font-size: 18px;
     font-family: 'Paperozi';
 }
@@ -188,7 +188,6 @@ footer {
 
 /* 메뉴 영역 */
 .footer-links {
-    font-family: 'NanumSquareRound';
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 32px;
@@ -200,30 +199,38 @@ footer {
     min-width: 0;
 }
 .footer-column h3 {
-    margin: 5px 0 10px;
-    font-size: 13px;
+    font-family: 'NanumSquareRound';
+    font-size: 12px;
     font-weight: 700;
-    color: #24364B;
+    color: #7A8797;
+    margin: 5px 0 9px;
 }
 .footer-column ul {
     display: flex;
     flex-direction: column;
-    gap: 5px;
+    gap: 2px;
     margin: 0;
     padding: 0;
     list-style: none;
 }
 .footer-column a {
-    display: inline-block;
-    color: #7A8797;
+    font-family: 'NanumSquareNeo';
     font-size: 13px;
+    /* color: #7A8797; */
+    color: #2b2b2b;
+    display: inline-block;
     line-height: 1.6;
     text-decoration: none;
     overflow-wrap: anywhere;
-    transition: color 0.2s ease;
+
+    background-image: linear-gradient(currentColor, currentColor);
+    background-repeat: no-repeat;
+    background-position: left bottom;
+    background-size: 0% 1px;
+    transition: background-size 0.2s ease;
 }
 .footer-column a:hover {
-    color: #24364B;
+    background-size: 100% 1px;
 }
 
 /* footer 하단 */

@@ -21,6 +21,12 @@
     font-weight: normal;
     font-display: swap;
 }
+@font-face {
+    font-family: 'NanumSquareNeo';
+    src: url(https://hangeul.pstatic.net/hangeul_static/webfont/NanumSquareNeo/NanumSquareNeoTTF-cBd.woff2);
+    font-weight: 700;
+    font-display: swap;
+}
 
 body {
     margin : 0;
