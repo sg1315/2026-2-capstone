@@ -1,124 +1,35 @@
-/* header 시작 */
-
-header {
-    min-height: 60px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-bottom: 1px solid #dbdee3;
-}
-
-#header-container {
-    width: min(1000px, calc(100% - 40px));
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 20px;
-}
-
-/* 로고 */
-.header-logo {
-    display: flex;
-    align-items: center;
-    flex-shrink: 0;
-}
-.header-logo img {
-    width: 30px;
-    height: 30px;
-    object-fit: contain;
-    margin-right: 3px;
-}
-.header-logo span {
-    font-size: 18px;
+/* Modi shared header/footer styles */
+@font-face {
     font-family: 'Paperozi';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/2408-3@1.0/Paperlogy-5Medium.woff2') format('woff2');
+    font-weight: 500;
+    font-display: swap;
 }
-
-/* 네비게이션 바 */
-nav {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 20px;
-    min-width: 0;
-}
-nav a {
-    margin-left: 5px;
-    margin-right: 5px;
-    white-space: nowrap;
-}
-
-/* 로그인 및 회원가입 버튼 */
-#buttons {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex-shrink: 0;
-}
-#buttons a {
-    box-sizing: border-box;
-    border-radius: 10px;
+@font-face {
     font-family: 'BithumbGothicOriginal';
-    height: 30px;
-    font-size: 13px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    white-space: nowrap;
-    text-decoration: none;
+    src: url('https://cdn.jsdelivr.net/gh/Project-Noonnu/2610082345@original/original/Bithumb Gothic Original.woff2') format('woff2');
+    font-weight: 700;
+    font-display: swap;
 }
-#buttons a:nth-child(1) {
-    width: 65px;
-    background-color: #ebebeb;
-    transition: background-color 0.2s ease;
+@font-face {
+    font-family: 'NanumSquareRound';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_two@1.0/NanumSquareRound.woff') format('woff');
+    font-weight: normal;
+    font-display: swap;
 }
-#buttons a:nth-child(1):hover {
-    background-color: #cecece;
-}
-#buttons a:nth-child(2) {
-    width: 85px;
-    background-color: #24364B;
-    color: white;
-    transition: background-color 0.2s ease;
-}
-#buttons a:nth-child(2):hover {
-    background-color: #75B8F5;
+@font-face {
+    font-family: 'NanumSquareNeo';
+    src: url(https://hangeul.pstatic.net/hangeul_static/webfont/NanumSquareNeo/NanumSquareNeoTTF-cBd.woff2);
+    font-weight: 700;
+    font-display: swap;
 }
 
-/* 반응형 처리 */
-@media (max-width: 800px) {
-    #h_container {
-        gap: 12px;
-    }
-
-    nav {
-        display: none;
-    }
-}
-@media (max-width: 600px) {
-    header {
-        height: auto;
-        padding: 12px 0;
-    }
-
-    #h_container {
-        flex-wrap: wrap;
-        row-gap: 14px;
-    }
-
-    nav {
-        order: 3;
-        width: 100%;
-        justify-content: center;
-        flex-wrap: wrap;
-        gap: 8px 14px;
-    }
-
-    #buttons {
-        margin-left: auto;
-    }
-}
-
-/* header 끝 */
+/* Header: brand + authentication actions */
+.site-header { font-family: var(--font-sans); }
+.site-header a { text-decoration: none; }
+.site-header .header-logo { text-decoration: none; }
+.site-header .header-login { transition: color .18s ease; }
+.site-header .header-signup { text-decoration: none; }
 
 /* footer 시작 */
 
@@ -265,7 +176,7 @@ footer {
 
 /* 반응형 처리 */
 @media (max-width: 900px) {
-    #f_container {
+    #footer-container {
         width: calc(100% - 48px);
         padding-top: 48px;
     }
@@ -283,7 +194,7 @@ footer {
     }
 }
 @media (max-width: 640px) {
-    #f_container {
+    #footer-container {
         width: calc(100% - 40px);
         padding-top: 36px;
         padding-bottom: 20px;

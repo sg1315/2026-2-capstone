@@ -4,7 +4,7 @@ from django.shortcuts import redirect, render
 from base.models import User
 
 def main(request):
-    return render(request, 'user/main.html')
+    return render(request, 'pages/main.html')
 
 def user_login(request):
     """

@@ -1,0 +1,236 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#24364B">
+    <meta name="description" content="회의부터 실행까지, 흩어진 업무를 한곳에 정리하는 Modi">
+    <title>Modi</title>
+    <link rel="icon" type="image/svg+xml" href="{% static 'images/modi-icon.svg' %}">
+    <link rel="stylesheet" href="{% static 'css/app.css' %}">
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+</head>
+<body class="landing-page">
+
+    <!-- header 추가 -->
+    {% include 'includes/header.html' %}
+
+    <div class="site-layout">
+        <aside class="app-sidebar" aria-label="주요 메뉴">
+            <div class="sidebar-topline">WORKSPACE</div>
+            <div class="sidebar-workspace">
+                <div class="workspace-mark">M</div>
+                <div class="workspace-copy">
+                    <strong>Modi Workspace</strong>
+                    <span>협업 공간</span>
+                </div>
+                <span class="workspace-chevron" aria-hidden="true">⌄</span>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a class="sidebar-link is-active" href="#projects">
+                    <span class="sidebar-icon icon-project" aria-hidden="true">▦</span>
+                    <span>프로젝트</span>
+                    <span class="sidebar-count">03</span>
+                </a>
+                <a class="sidebar-link" href="#tasks">
+                    <span class="sidebar-icon icon-task" aria-hidden="true">☷</span>
+                    <span>업무 관리</span>
+                    <span class="sidebar-count">12</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-divider"></div>
+            <div class="sidebar-mini-label">MODI가 도와드려요</div>
+            <div class="sidebar-help-card">
+                <div class="help-card-icon" aria-hidden="true">✦</div>
+                <strong>회의 정리, 더 간단하게</strong>
+                <p>회의 파일 하나로 핵심 내용과 할 일을 정리해 보세요.</p>
+                <a href="#how-it-works">작동 방식 보기 <span aria-hidden="true">→</span></a>
+            </div>
+
+            <div class="sidebar-bottom">
+                <span class="sidebar-status-dot"></span>
+                <span>생산적인 협업을 위한 공간</span>
+            </div>
+        </aside>
+
+        <main class="landing-content">
+            <section class="hero-section">
+                <div class="hero-copy">
+                    <div class="eyebrow"><span class="eyebrow-sparkle">✦</span> LESS NOTES. MORE MOMENTUM.</div>
+                    <h1>회의가 끝나도,<br><span>일은 앞으로.</span></h1>
+                    <p class="hero-description">
+                        회의 내용을 다시 정리하느라 시간을 쓰지 마세요.<br class="desktop-break">
+                        Modi가 핵심을 정리하고, 다음 할 일까지 이어줍니다.
+                    </p>
+                    <div class="hero-actions">
+                        <a class="btn btn-primary btn-lg" href="#how-it-works">Modi 시작하기 <span aria-hidden="true">↗</span></a>
+                        <a class="hero-secondary-link" href="#features">기능 살펴보기 <span aria-hidden="true">↓</span></a>
+                    </div>
+                    <div class="hero-proof">
+                        <div class="proof-avatars" aria-hidden="true">
+                            <span>팀</span><span>업</span><span>✓</span>
+                        </div>
+                        <p><strong>기록에 쓰는 시간은 줄이고</strong><br>실행에 집중하는 협업을 시작하세요.</p>
+                    </div>
+                </div>
+
+                <div class="hero-visual" aria-label="대표 이미지">
+                    <div class="visual-glow"></div>
+                    <div class="hero-image-slot image-slot">
+                        <div class="image-slot-content">
+                            <video autoplay muted loop playsinline>
+                                <source src="/static/videos/modi-intro.mp4" type="video/mp4">
+                            </video>
+                        </div>
+                    </div>
+                    <div class="floating-note floating-note-top"><span class="floating-note-icon">✦</span><div><strong>회의 핵심만 쏙</strong><small>AI 요약 정리 완료</small></div><span class="floating-check">✓</span></div>
+                    <div class="floating-note floating-note-bottom"><div class="floating-check large">✓</div><div><strong>다음 할 일까지 연결</strong><small>업무 항목이 준비됐어요</small></div></div>
+                    <div class="visual-caption"><span></span> YOUR TEAM, IN SYNC</div>
+                </div>
+                <div class="hero-decoration decoration-one"></div>
+                <div class="hero-decoration decoration-two"></div>
+            </section>
+
+            <section class="trust-strip" aria-label="Modi의 핵심 가치">
+                <p>흩어진 회의 정보, 하나의 흐름으로</p>
+                <div class="trust-items">
+                    <span><i>✦</i> AI 기반 회의 정리</span>
+                    <span><i>↗</i> 명확한 업무 연결</span>
+                    <span><i>◎</i> 한눈에 보는 진행 상황</span>
+                </div>
+            </section>
+
+            <section class="feature-section section-block" id="features">
+                <div class="section-intro">
+                    <span class="eyebrow">LESS ADMIN. MORE PROGRESS.</span>
+                    <h2>회의가 끝나도,<br><span>일의 흐름은 이어지도록.</span></h2>
+                    <p>기록을 남기는 데서 끝나지 않도록. 회의에서 나온 생각을 팀의 다음 행동으로 연결합니다.</p>
+                </div>
+                <div class="feature-grid">
+                    <article class="feature-card feature-card-primary">
+                        <div class="feature-card-top"><span class="feature-number">01 / CAPTURE</span><span class="feature-icon">↗</span></div>
+                        <div class="feature-illustration capture-illustration image-slot" aria-label="회의 파일 / 음성 파형 이미지 삽입 영역">
+                            <div class="image-slot-content">
+
+                                <!-- 이미지 영역 -->
+
+                            </div>
+                        </div>
+                        <h3>회의 자료를 한곳에</h3>
+                        <p>음성 파일과 문서를 업로드해 회의 기록을 체계적으로 관리하세요.</p>
+                        <span class="feature-tag">AUDIO & DOCUMENTS</span>
+                    </article>
+                    <article class="feature-card">
+                        <div class="feature-card-top"><span class="feature-number">02 / UNDERSTAND</span><span class="feature-icon">✦</span></div>
+                        <div class="feature-illustration summary-illustration image-slot" aria-label="AI 회의 요약 이미지 삽입 영역">
+                            <div class="image-slot-content">
+
+                                <!-- 이미지 영역 -->
+
+                            </div>
+                        </div>
+                        <h3>핵심만 빠르게 파악</h3>
+                        <p>긴 회의 내용에서 주요 논의와 결정 사항을 보기 쉽게 정리합니다.</p>
+                        <span class="feature-tag">AI-POWERED SUMMARY</span>
+                    </article>
+                    <article class="feature-card">
+                        <div class="feature-card-top"><span class="feature-number">03 / TAKE ACTION</span><span class="feature-icon">✓</span></div>
+                        <div class="feature-illustration task-illustration image-slot" aria-label="업무 관리 이미지 삽입 영역">
+                            <div class="image-slot-content">
+
+                                <!-- 이미지 영역 -->
+
+                            </div>
+                        </div>
+                        <h3>할 일을 놓치지 않게</h3>
+                        <p>회의에서 나온 업무를 분리해 확인하고, 진행 상황을 이어서 관리하세요.</p>
+                        <span class="feature-tag">ACTION ITEMS</span>
+                    </article>
+                </div>
+            </section>
+
+            <section class="workflow-section section-block" id="how-it-works">
+                <div class="workflow-copy">
+                    <span class="eyebrow">A CLEARER WAY TO WORK</span>
+                    <h2>복잡한 회의 정리는<br>이제 세 단계로.</h2>
+                    <p>회의가 끝난 후 반복하던 정리 작업을 간단한 흐름으로 바꿔 보세요.</p>
+                    <a class="text-link" href="#projects">Modi의 기능 알아보기 <span aria-hidden="true">→</span></a>
+                </div>
+                <div class="workflow-steps">
+                    <article class="workflow-step">
+                        <div class="step-number">01</div><div class="step-connector"></div>
+                        <div class="step-content"><span>UPLOAD</span><h3>파일 업로드</h3><p>회의 음성이나 관련 문서를 업로드합니다.</p></div>
+                        <div class="step-symbol">↑</div>
+                    </article>
+                    <article class="workflow-step">
+                        <div class="step-number">02</div><div class="step-connector"></div>
+                        <div class="step-content"><span>ORGANIZE</span><h3>내용 정리</h3><p>회의 요약과 핵심 결정 사항을 확인합니다.</p></div>
+                        <div class="step-symbol">✦</div>
+                    </article>
+                    <article class="workflow-step">
+                        <div class="step-number">03</div>
+                        <div class="step-content"><span>MOVE FORWARD</span><h3>업무 실행</h3><p>정리된 할 일을 확인하고 팀의 다음 단계로 이어갑니다.</p></div>
+                        <div class="step-symbol">↗</div>
+                    </article>
+                </div>
+            </section>
+
+            <section class="workspace-section section-block" id="projects">
+                <div class="workspace-heading">
+                    <div><span class="eyebrow">ONE SPACE, SHARED CLARITY</span><h2>프로젝트부터 업무까지,<br><span>같은 방향을 바라보도록.</span></h2></div>
+                    <p>중요한 정보는 쉽게 찾고, 다음에 해야 할 일은 분명하게.</p>
+                </div>
+                <div class="workspace-cards">
+                    <article class="workspace-card project-preview">
+                        <div class="workspace-card-heading"><div><span class="workspace-card-icon">▦</span><span class="workspace-kicker">PROJECT SPACE</span></div><span class="preview-arrow">↗</span></div>
+                        <h3>프로젝트를 한눈에</h3>
+                        <p>프로젝트별 회의 기록과 주요 정보를 연결해 관리하세요.</p>
+                        <div class="project-board">
+                            <div class="board-column"><span class="board-column-title"><i class="dot dot-blue"></i> 진행 중 <b>2</b></span><div class="board-ticket"><i class="ticket-color"></i><b>서비스 화면 설계</b><small>기획 · 디자인</small><span class="ticket-avatars"><i>M</i><i>J</i></span></div><div class="board-ticket"><i class="ticket-color violet"></i><b>회의록 자동 정리</b><small>개발 · AI</small><span class="ticket-avatars"><i>S</i><i>K</i></span></div></div>
+                            <div class="board-column"><span class="board-column-title"><i class="dot dot-green"></i> 완료 <b>1</b></span><div class="board-ticket completed"><i class="ticket-color green"></i><b>요구사항 정리</b><small>문서 · 분석</small><span class="ticket-done">✓ 완료</span></div></div>
+                        </div>
+                        <a class="workspace-card-link" href="#projects">프로젝트 기능 살펴보기 <span>→</span></a>
+                    </article>
+                    <article class="workspace-card task-preview" id="tasks">
+                        <div class="workspace-card-heading"><div><span class="workspace-card-icon task-icon">☷</span><span class="workspace-kicker">TASK MANAGEMENT</span></div><span class="preview-arrow">↗</span></div>
+                        <h3>해야 할 일을 명확하게</h3>
+                        <p>업무와 진행 상태를 정리해 다음 행동을 놓치지 마세요.</p>
+                        <div class="task-board">
+                            <div class="task-board-header"><b>이번 주 업무</b><span>3개 항목</span></div>
+                            <div class="task-board-row"><i class="task-box checked">✓</i><span class="task-board-text done-text">회의 자료 취합</span><span class="task-status status-done">완료</span></div>
+                            <div class="task-board-row"><i class="task-box"></i><span class="task-board-text">대시보드 UI 검토</span><span class="task-status status-progress">진행 중</span></div>
+                            <div class="task-board-row"><i class="task-box"></i><span class="task-board-text">회의 결과 공유</span><span class="task-status status-upcoming">예정</span></div>
+                            <div class="task-progress"><div><span>주간 진행률</span><b>33%</b></div><div class="progress"><div class="progress-bar" style="width:33%"></div></div></div>
+                        </div>
+                        <a class="workspace-card-link" href="#tasks">업무 관리 기능 살펴보기 <span>→</span></a>
+                    </article>
+                </div>
+            </section>
+
+            <section class="closing-cta">
+                <div class="cta-orbit orbit-a"></div><div class="cta-orbit orbit-b"></div>
+                <div class="cta-content">
+                    <span class="cta-label"><i>✦</i> MAKE EVERY MEETING COUNT</span>
+                    <h2>좋은 회의의 다음은<br>좋은 실행입니다.</h2>
+                    <p>회의를 정리하는 시간은 줄이고, 팀이 앞으로 나아가는 시간은 늘려 보세요.</p>
+                    <a href="#" class="btn btn-light btn-lg">Modi와 시작하기 <span aria-hidden="true">↗</span></a>
+                </div>
+                <div class="cta-visual-placeholder" aria-label="팀 협업 이미지 삽입 영역">
+                    <div class="cta-image-frame">
+                        
+                        <!-- 이미지 영역 -->
+
+                    </div>
+                    <div class="cta-floating-chip"><span>✦</span> Less busywork, more progress.</div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- {% include 'includes/footer.html' %} -->
+     
+</body>
+</html>
