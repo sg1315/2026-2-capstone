@@ -16,4 +16,3 @@ class User(AbstractUser):
         db_table = 'user'
         verbose_name = '사용자'
         verbose_name_plural = verbose_name
-        ordering = ('-id',)
