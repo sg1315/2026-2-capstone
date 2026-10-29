@@ -1,0 +1,301 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UI 스타일 가이드</title>
+    <link rel="stylesheet" href="{% static 'css/app.css' %}">
+</head>
+<body>
+
+<div class="page-shell">
+    <div class="container">
+
+        <!-- Page Header -->
+        <header class="page-header">
+            <div>
+                <h1 class="page-title">UI 스타일 가이드</h1>
+                <p class="page-description">공통 CSS를 적용한 컴포넌트 프리뷰 페이지입니다. 버튼, 카드, 테이블 등 다양한 요소를 확인하세요.</p>
+            </div>
+            <div class="cluster">
+                <button class="btn btn-secondary">문서 보기</button>
+                <button class="btn btn-primary">새 프로젝트 시작</button>
+            </div>
+        </header>
+
+        <hr class="divider">
+
+        <!-- 1. Typography & Badges -->
+        <section class="section">
+            <header class="section-header">
+                <h2 class="section-title">1. 타이포그래피 & 배지</h2>
+            </header>
+
+            <div class="grid grid-2">
+                <div class="card">
+                    <h1>Heading 1 (H1)</h1>
+                    <h2>Heading 2 (H2)</h2>
+                    <h3>Heading 3 (H3)</h3>
+                    <h4>Heading 4 (H4)</h4>
+                    <p class="text-secondary">이것은 기본 본문(Body) 텍스트입니다. 가독성을 위해 적절한 줄간격과 색상이 적용되었습니다.</p>
+                    <small class="text-muted">이것은 작은 텍스트(Small text)입니다.</small>
+                </div>
+                <div class="card stack">
+                    <h3 class="card-title">상태 배지 (Badges)</h3>
+                    <div class="cluster">
+                        <span class="badge badge-neutral">Neutral</span>
+                        <span class="badge badge-brand">Brand</span>
+                        <span class="badge badge-success">Success</span>
+                        <span class="badge badge-warning">Warning</span>
+                        <span class="badge badge-danger">Danger</span>
+                        <span class="badge badge-info">Info</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. Buttons -->
+        <section class="section">
+            <header class="section-header">
+                <h2 class="section-title">2. 버튼 컴포넌트</h2>
+            </header>
+
+            <div class="card stack">
+                <div class="cluster">
+                    <button class="btn btn-primary">Primary Button</button>
+                    <button class="btn btn-accent">Accent Button</button>
+                    <button class="btn btn-secondary">Secondary Button</button>
+                    <button class="btn btn-danger">Danger Button</button>
+                    <button class="btn btn-ghost">Ghost Button</button>
+                </div>
+                <hr class="divider">
+                <div class="cluster">
+                    <button class="btn btn-primary btn-sm">Small (sm)</button>
+                    <button class="btn btn-primary">Default (md)</button>
+                    <button class="btn btn-primary btn-lg">Large (lg)</button>
+                    <button class="btn btn-primary" disabled>Disabled</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. Form & Inputs -->
+        <section class="section">
+            <header class="section-header">
+                <h2 class="section-title">3. 폼 필드 & 입력창</h2>
+            </header>
+
+            <div class="grid grid-2">
+                <div class="card stack">
+                    <div class="form-group">
+                        <label class="form-label" for="username">사용자 이름</label>
+                        <input type="text" id="username" class="input" placeholder="홍길동">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="email">이메일 주소</label>
+                        <input type="email" id="email" class="input" placeholder="example@email.com">
+                        <p class="form-hint">비밀번호 재설정 시 사용됩니다.</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="status">상태 선택</label>
+                        <select id="status" class="select">
+                            <option>진행 중</option>
+                            <option>완료됨</option>
+                            <option>대기 중</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="card stack">
+                    <div class="form-group">
+                        <label class="form-label">검색</label>
+                        <div class="search-field">
+                            <span class="search-icon">🔍</span>
+                            <input type="text" class="input" placeholder="프로젝트 검색...">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="desc">상세 설명</label>
+                        <textarea id="desc" class="textarea" placeholder="내용을 입력하세요..."></textarea>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. Dashboard Stats & Progress -->
+        <section class="section">
+            <header class="section-header">
+                <h2 class="section-title">4. 대시보드 통계 & 상태바</h2>
+            </header>
+
+            <div class="grid grid-3">
+                <div class="stat-card">
+                    <div>
+                        <p class="stat-label">총 사용자</p>
+                        <p class="stat-value">12,450</p>
+                        <p class="stat-note text-success">↑ 지난달 대비 12% 증가</p>
+                    </div>
+                    <div class="avatar">U</div>
+                </div>
+                <div class="stat-card">
+                    <div>
+                        <p class="stat-label">진행중인 프로젝트</p>
+                        <p class="stat-value">34</p>
+                        <p class="stat-note">5개 마감 임박</p>
+                    </div>
+                    <div class="avatar">P</div>
+                </div>
+                <div class="stat-card">
+                    <div>
+                        <p class="stat-label">저장 공간 사용량</p>
+                        <p class="stat-value">68%</p>
+                        <p class="stat-note">1TB 중 680GB 사용</p>
+                    </div>
+                    <div class="avatar">D</div>
+                </div>
+            </div>
+
+            <div class="card" style="margin-top: var(--space-4);">
+                <div class="form-group">
+                    <label class="form-label">시스템 업로드 진행률</label>
+                    <div class="progress">
+                        <div class="progress-bar" style="width: 65%;"></div>
+                    </div>
+                    <p class="text-sm text-muted" style="text-align: right; margin-top: 5px;">65% 완료됨</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. Tables & Alerts -->
+        <section class="section">
+            <header class="section-header">
+                <h2 class="section-title">5. 테이블 & 알림 메시지</h2>
+            </header>
+
+            <div class="stack">
+                <!-- Alerts -->
+                <div class="alert alert-info">새로운 기능이 업데이트 되었습니다. 설정에서 확인해보세요.</div>
+                <div class="alert alert-danger">서버와의 연결이 끊어졌습니다. 네트워크 상태를 확인하세요.</div>
+
+                <!-- Table -->
+                <div class="table-wrap" style="margin-top: var(--space-4);">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>프로젝트명</th>
+                                <th>담당자</th>
+                                <th>상태</th>
+                                <th>마감일</th>
+                                <th>관리</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><a href="#" style="font-weight: 600;">웹사이트 리뉴얼</a></td>
+                                <td>김철수</td>
+                                <td><span class="badge badge-success">완료됨</span></td>
+                                <td>2024-03-15</td>
+                                <td><button class="btn btn-ghost btn-sm">수정</button></td>
+                            </tr>
+                            <tr>
+                                <td><a href="#" style="font-weight: 600;">데이터 마이그레이션</a></td>
+                                <td>이영희</td>
+                                <td><span class="badge badge-warning">진행 중</span></td>
+                                <td>2024-04-01</td>
+                                <td><button class="btn btn-ghost btn-sm">수정</button></td>
+                            </tr>
+                            <tr>
+                                <td><a href="#" style="font-weight: 600;">앱 API 연동</a></td>
+                                <td>박민수</td>
+                                <td><span class="badge badge-danger">지연됨</span></td>
+                                <td>2024-03-10</td>
+                                <td><button class="btn btn-ghost btn-sm">수정</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- 6. Empty States & Upload -->
+        <section class="section">
+            <header class="section-header">
+                <h2 class="section-title">6. 빈 화면 & 파일 업로드</h2>
+            </header>
+
+            <div class="grid grid-2">
+                <div class="empty-state">
+                    <h3>등록된 데이터가 없습니다</h3>
+                    <p>아직 생성된 프로젝트가 없습니다. 새로운 프로젝트를 생성하여 팀원들과 협업을 시작해보세요.</p>
+                    <button class="btn btn-primary" style="margin-top: var(--space-2);">프로젝트 생성하기</button>
+                </div>
+
+                <div class="upload-zone">
+                    <p class="upload-zone-title">파일을 여기로 드래그 앤 드롭</p>
+                    <p class="upload-zone-description">또는 클릭하여 파일을 선택하세요 (최대 50MB)</p>
+                    <input type="file" style="display: none;" id="file-upload">
+                    <label for="file-upload" class="btn btn-secondary">파일 찾아보기</label>
+                </div>
+            </div>
+        </section>
+
+        <!-- 7. Modals (새로 추가된 영역) -->
+        <section class="section">
+            <header class="section-header">
+                <h2 class="section-title">7. 모달 팝업 (Modal)</h2>
+            </header>
+
+            <div class="card" style="text-align: center; padding: 3rem;">
+                <p class="text-secondary" style="margin-bottom: var(--space-4);">버튼을 클릭하여 화면 위에 나타나는 팝업 창 레이아웃을 확인해보세요.</p>
+                <!-- 모달을 여는 스크립트 실행 버튼 -->
+                <button class="btn btn-primary" onclick="document.getElementById('exampleModal').style.display='grid'">모달 띄우기</button>
+            </div>
+        </section>
+
+    </div>
+</div>
+
+<!-- ============================================== -->
+<!-- 모달 창 UI 컴포넌트 (기본적으로는 숨겨져 있음) -->
+<!-- ============================================== -->
+<!--
+  모달 배경(modal-backdrop)은 CSS 설정상 display가 grid일 때 정중앙에 배치됩니다.
+  인라인 스타일(style="display: none;")을 사용해 처음엔 보이지 않게 처리합니다.
+-->
+<div id="exampleModal" class="modal-backdrop" style="display: none;">
+    <div class="modal stack">
+        <!-- 모달 헤더 -->
+        <div class="card-header" style="margin-bottom: 0;">
+            <h3 class="card-title">새 프로젝트 생성</h3>
+            <!-- 모달 닫기 버튼 -->
+            <button class="btn btn-ghost btn-sm" onclick="document.getElementById('exampleModal').style.display='none'">✕</button>
+        </div>
+
+        <hr class="divider">
+
+        <!-- 모달 본문 폼 -->
+        <div class="form-group">
+            <label class="form-label" for="modal-proj-name">프로젝트 이름</label>
+            <input type="text" id="modal-proj-name" class="input" placeholder="예: 웹사이트 리뉴얼 2차">
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" for="modal-proj-desc">설명</label>
+            <textarea id="modal-proj-desc" class="textarea" placeholder="프로젝트에 대한 간단한 설명을 입력하세요..."></textarea>
+        </div>
+
+        <hr class="divider">
+
+        <!-- 모달 액션(버튼 영역) -->
+        <div class="cluster" style="justify-content: flex-end;">
+            <button class="btn btn-secondary" onclick="document.getElementById('exampleModal').style.display='none'">취소</button>
+            <button class="btn btn-primary">생성하기</button>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
