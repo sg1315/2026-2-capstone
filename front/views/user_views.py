@@ -6,7 +6,7 @@ from base.models import User
 
 
 def main(request):
-    return render(request, 'pages/main.html')
+    return render(request, 'main/main.html')
 
 def user_login(request):
     """
