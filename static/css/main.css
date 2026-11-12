@@ -663,3 +663,192 @@ body.landing-page { background: var(--modi-paper); }
     background: #FFFFFF;
     border-color: #EAE7E3;
 }
+
+/* 로그인 전 사이드바: 워크스페이스 접근 안내 */
+.sidebar-guest-panel {
+    position: relative;
+    overflow: hidden;
+    margin-top: 14px;
+    padding: 18px 13px 14px;
+    border: 1px solid #E4EAEC;
+    border-radius: 10px;
+    background:
+        radial-gradient(circle at 100% 0%, rgba(80,176,209,.13), transparent 38%),
+        linear-gradient(150deg, #F5FAFB 0%, #FFFFFF 78%);
+}
+
+.sidebar-guest-panel::after {
+    position: absolute;
+    top: -27px;
+    right: -24px;
+    width: 88px;
+    height: 88px;
+    border: 1px solid rgba(80,176,209,.18);
+    border-radius: 50%;
+    content: "";
+    pointer-events: none;
+}
+
+.guest-panel-icon {
+    display: grid;
+    width: 34px;
+    height: 34px;
+    margin-bottom: 15px;
+    place-items: center;
+    border: 1px solid #D8EAF0;
+    border-radius: 9px;
+    color: #347F9B;
+    background: #FFFFFF;
+    box-shadow: 2px 2px 0 rgba(80,176,209,.12);
+    font-size: 16px;
+}
+
+.guest-panel-kicker {
+    display: block;
+    margin-bottom: 8px;
+    color: #438DA8;
+    font-size: 8px;
+    font-weight: 800;
+    letter-spacing: 1.15px;
+}
+
+.sidebar-guest-panel h2 {
+    margin: 0 0 9px;
+    color: #24364B;
+    font-size: 16px;
+    font-weight: 800;
+    line-height: 1.45;
+    letter-spacing: -.65px;
+    word-break: keep-all;
+}
+
+.sidebar-guest-panel > p {
+    margin: 0 0 15px;
+    color: #718094;
+    font-size: 10px;
+    line-height: 1.75;
+    word-break: keep-all;
+}
+
+.guest-menu-preview {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin-bottom: 14px;
+    padding: 7px;
+    border: 1px solid #E9EEF0;
+    border-radius: 8px;
+    background: rgba(255,255,255,.78);
+}
+
+.guest-menu-item {
+    display: flex;
+    min-height: 34px;
+    align-items: center;
+    gap: 9px;
+    padding: 0 7px;
+    border-radius: 6px;
+    color: #87939D;
+    font-size: 10px;
+    font-weight: 600;
+}
+
+.guest-menu-item .sidebar-icon {
+    width: 17px;
+    color: #A0ADB5;
+    font-size: 16px;
+}
+
+.guest-lock {
+    display: grid;
+    width: 19px;
+    height: 19px;
+    margin-left: auto;
+    place-items: center;
+    border-radius: 5px;
+    color: #8C9BA3;
+    background: #F1F5F6;
+    font-size: 12px;
+}
+
+.guest-login-link {
+    display: flex;
+    min-height: 37px;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 0 9px;
+    border: 1px solid #24364B;
+    border-radius: 7px;
+    color: #FFFFFF;
+    background: #24364B;
+    box-shadow: 3px 3px 0 rgba(80,176,209,.28);
+    font-size: 10px;
+    font-weight: 700;
+    transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
+}
+
+.guest-login-link:hover {
+    transform: translate(2px,2px);
+    box-shadow: 1px 1px 0 rgba(80,176,209,.28);
+    color: #FFFFFF;
+    background: #304B68;
+}
+
+.guest-login-link span {
+    font-size: 14px;
+}
+
+.guest-panel-footnote {
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    margin-top: 12px;
+    color: #98A3AA;
+    font-size: 8px;
+    line-height: 1.5;
+    word-break: keep-all;
+}
+
+.guest-footnote-dot {
+    flex: 0 0 5px;
+    width: 5px;
+    height: 5px;
+    margin-top: 3px;
+    border-radius: 50%;
+    background: #50B0D1;
+    box-shadow: 0 0 0 3px rgba(80,176,209,.12);
+}
+
+@media (max-width: 720px) {
+    .sidebar-guest-panel {
+        max-width: 420px;
+        margin: 4px auto;
+        padding: 14px;
+    }
+
+    .sidebar-guest-panel h2 {
+        font-size: 15px;
+    }
+
+    .guest-menu-preview {
+        flex-direction: row;
+    }
+
+    .guest-menu-item {
+        flex: 1;
+        min-width: 0;
+        gap: 5px;
+        padding-inline: 5px;
+        font-size: 9px;
+    }
+
+    .guest-menu-item .sidebar-icon {
+        flex: 0 0 16px;
+    }
+
+    .guest-lock {
+        width: 16px;
+        height: 16px;
+    }
+}
