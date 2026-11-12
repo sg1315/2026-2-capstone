@@ -56,11 +56,11 @@ def user_signup_action(request: HttpRequest):
     사용자 등록
     """
     if request.method == 'POST':
-        username = request.POST.get('username').strip()
-        name = request.POST.get('name')
-        email = request.POST.get('email').strip()
-        password = request.POST.get('password').strip()
-        confirm_password = request.POST.get('confirm_password').strip()
+        username = request.POST.get('username', '').strip()
+        name = request.POST.get('name', '').strip()
+        email = request.POST.get('email', '').strip()
+        password = request.POST.get('password', '').strip()
+        confirm_password = request.POST.get('confirm_password', '').strip()
 
         username_check = User.objects.filter(username=username)
         if username_check:
@@ -73,7 +73,7 @@ def user_signup_action(request: HttpRequest):
             if password != confirm_password:
                 return JsonResponse({'message': '비밀번호와 확인 비밀번호가 일치하지 않습니다.'}, status=400)
 
-        user = User.objects.create_user(username=username, name=name, email=email, password=password, permission='1')
+        user = User.objects.create_user(username=username, name=name, email=email, password=password, is_superuser=False)
         user.save()
 
         return JsonResponse({'message': '회원가입이 완료되었습니다.'}, status=200)
