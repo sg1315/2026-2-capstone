@@ -187,6 +187,7 @@ body.landing-page { background: var(--modi-paper); }
     background: #fff;
     box-shadow: 0 2px 7px rgba(36,54,75,.035);
 }
+
 .workspace-mark { border-radius: 8px; color: #fff; background: var(--modi-ink); }
 .sidebar-link { border-radius: 8px; color: #66778A; }
 .sidebar-link:hover { color: var(--modi-ink); background: #F0F6F9; }
