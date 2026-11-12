@@ -14,6 +14,7 @@ urlpatterns = [
     # 로그인
     path('user/login/', user_views.user_login, name="user_login"),
     path('user/signup/', user_views.user_signup, name='user_signup'),
+    path('user/signupAction/', user_views.user_signup_action, name='user_signup_action'),
 
 
 ]
