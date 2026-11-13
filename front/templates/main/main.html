@@ -9,6 +9,7 @@
     <title>Modi</title>
     <link rel="icon" type="image/svg+xml" href="{% static 'images/modi-icon.svg' %}">
     <link rel="stylesheet" href="{% static 'css/app.css' %}">
+    <link rel="stylesheet" href="{% static 'css/common.css' %}">
     <link rel="stylesheet" href="{% static 'css/main.css' %}">
 </head>
 <body class="landing-page">
@@ -16,80 +17,14 @@
     <!-- header 추가 -->
     {% include 'includes/header.html' %}
 
+
+    <!-- 사이드바 사용 시 반드시 site-layout으로 감싸야 함 -->
     <div class="site-layout">
-        <aside class="app-sidebar" aria-label="주요 메뉴">
-            {% if user.is_authenticated %}
-                <!-- 로그인한 사용자에게만 워크스페이스 메뉴 표시 -->
-                <div class="sidebar-topline">WORKSPACE</div>
-                <div class="sidebar-workspace">
-                    <div class="workspace-mark">M</div>
-                    <div class="workspace-copy">
-                        <strong>Modi Workspace</strong>
-                        <span>협업 공간</span>
-                    </div>
-                    <span class="workspace-chevron" aria-hidden="true">⌄</span>
-                </div>
 
-                <nav class="sidebar-nav">
-                    <a class="sidebar-link is-active" href="#projects">
-                        <span class="sidebar-icon icon-project" aria-hidden="true">▦</span>
-                        <span>프로젝트</span>
-                        <span class="sidebar-count">03</span>
-                    </a>
-                    <a class="sidebar-link" href="#tasks">
-                        <span class="sidebar-icon icon-task" aria-hidden="true">☷</span>
-                        <span>업무 관리</span>
-                        <span class="sidebar-count">12</span>
-                    </a>
-                </nav>
-            {% else %}
-                <!-- 로그인 전에는 워크스페이스 이용 안내 표시 -->
-                <div class="sidebar-topline">WORKSPACE</div>
-                <section class="sidebar-guest-panel" aria-label="로그인 후 이용 가능한 메뉴">
-                    <div class="guest-panel-icon" aria-hidden="true">✦</div>
-                    <span class="guest-panel-kicker">YOUR TEAM SPACE</span>
-                    <h2>함께하는 공간,<br>로그인 후 열려요.</h2>
-                    <p>로그인하고 프로젝트와 업무를 한곳에서 관리해 보세요.</p>
+        <!-- sidebar 추가 -->
+        {% include 'includes/sidebar.html' %}
 
-                    <div class="guest-menu-preview">
-                        <div class="guest-menu-item">
-                            <span class="sidebar-icon icon-project" aria-hidden="true">▦</span>
-                            <span>프로젝트</span>
-                            <span class="guest-lock" aria-label="로그인 필요">⌑</span>
-                        </div>
-                        <div class="guest-menu-item">
-                            <span class="sidebar-icon icon-task" aria-hidden="true">☷</span>
-                            <span>업무 관리</span>
-                            <span class="guest-lock" aria-label="로그인 필요">⌑</span>
-                        </div>
-                    </div>
-
-                    <!-- TODO: 실제 로그인 URL로 href를 연결해 주세요. -->
-                    <a class="guest-login-link" href="#">
-                        로그인하고 시작하기 <span aria-hidden="true">→</span>
-                    </a>
-                    <div class="guest-panel-footnote">
-                        <span class="guest-footnote-dot"></span>
-                        Modi와 더 효율적인 협업을 시작하세요.
-                    </div>
-                </section>
-            {% endif %}
-
-            <div class="sidebar-divider"></div>
-            <div class="sidebar-mini-label">MODI가 도와드려요</div>
-            <div class="sidebar-help-card">
-                <div class="help-card-icon" aria-hidden="true">✦</div>
-                <strong>회의 정리, 더 간단하게</strong>
-                <p>회의 파일 하나로 핵심 내용과 할 일을 정리해 보세요.</p>
-                <a href="#how-it-works">작동 방식 보기 <span aria-hidden="true">→</span></a>
-            </div>
-
-            <div class="sidebar-bottom">
-                <span class="sidebar-status-dot"></span>
-                <span>생산적인 협업을 위한 공간</span>
-            </div>
-        </aside>
-
+        <!-- 페이지 콘텐츠 -->
         <main class="landing-content">
             <section class="hero-section">
                 <div class="hero-copy">
@@ -256,6 +191,7 @@
         </main>
     </div>
 
+    <!-- footer 추가 (현재 미사용) -->
     <!-- {% include 'includes/footer.html' %} -->
      
 </body>
