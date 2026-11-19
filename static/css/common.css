@@ -1,3 +1,8 @@
+/*
+ * header, footer, sidebar
+ */
+
+
 /* 공용 폰트 */
 @font-face {
     font-family: 'Paperozi';
@@ -31,6 +36,48 @@
 .site-header .header-logo { text-decoration: none; }
 .site-header .header-login { transition: color .18s ease; }
 .site-header .header-signup { text-decoration: none; }
+
+/* 로그인 후 헤더 */
+.header-user {
+    color: var(--modi-ink);
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.header-actions form {
+    margin: 0;
+}
+
+.header-logout {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    height: 34px;
+    padding: 0 13px;
+
+    border: 1.5px solid #E9E9E9;
+    border-radius: 999px;
+
+    color: #777;
+    background: #fff;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: .2s ease;
+}
+.logout-icon {
+    width: 15px;
+    height: 15px;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+.header-logout:hover {
+    border-color: #C9D1DA;
+    color: var(--modi-ink);
+}
 
 /* Header 끝 */
 
@@ -179,8 +226,6 @@
     font-weight: 700;
     transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
 }.guest-login-link:hover {
-    transform: translate(2px,2px);
-    box-shadow: 1px 1px 0 rgba(80,176,209,.28);
     color: #FFFFFF;
     background: #304B68;
 }.guest-login-link span {
