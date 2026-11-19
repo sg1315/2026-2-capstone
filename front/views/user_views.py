@@ -44,6 +44,15 @@ def user_login(request):
 
     return render(request, 'user/user_login.html')
 
+def user_logout(request):
+    """
+    로그아웃
+    """
+    if request.method == 'POST':
+        auth.logout(request)
+
+    return redirect('main')
+
 def user_signup(request: HttpRequest):
     """
     회원가입

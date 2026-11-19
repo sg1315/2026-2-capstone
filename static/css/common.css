@@ -49,21 +49,34 @@
 }
 
 .header-logout {
-    min-height: 43px;
-    padding: 0 18px;
-    border: 1px solid var(--modi-ink);
-    border-radius: 8px;
-    color: var(--modi-ink);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    height: 34px;
+    padding: 0 13px;
+
+    border: 1.5px solid #E9E9E9;
+    border-radius: 999px;
+
+    color: #777;
     background: #fff;
-    font-size: 13px;
-    font-weight: 600;
+    font-size: 12px;
+    font-weight: 500;
     cursor: pointer;
     transition: .2s ease;
 }
-
+.logout-icon {
+    width: 15px;
+    height: 15px;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
 .header-logout:hover {
-    color: #fff;
-    background: var(--modi-ink);
+    border-color: #C9D1DA;
+    color: var(--modi-ink);
 }
 
 /* Header 끝 */

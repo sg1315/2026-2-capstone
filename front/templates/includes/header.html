@@ -22,10 +22,15 @@
                     {{ user.name|default:user.username }}님
                 </span>
 
-                <form method="POST" action="#">
+                <form method="POST" action="{% url 'user_logout' %}">
                     {% csrf_token %}
                     <button type="submit" class="header-logout">
-                        로그아웃
+                        <span>로그아웃</span>
+                        <svg class="logout-icon" viewBox="0 0 24 24" fill="none">
+                            <path d="M10 17L15 12L10 7" />
+                            <path d="M15 12H3" />
+                            <path d="M14 3H19C20.1 3 21 3.9 21 5V19C21 20.1 20.1 21 19 21H14" />
+                        </svg>
                     </button>
                 </form>
 
