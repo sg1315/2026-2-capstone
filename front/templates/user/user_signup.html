@@ -3,121 +3,138 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>회원가입</title>
-
-    <!-- 파비콘 변경 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#24364B">
+    <title>회원가입 | MODI</title>
     <link rel="icon" type="image/svg+xml" href="{% static 'images/modi-icon.svg' %}">
-
-    <!-- app.css 연결 -->
     <link rel="stylesheet" href="{% static 'css/app.css' %}">
-
-    <!-- header, footer CSS 연결 -->
-    <link rel="stylesheet" href="{% static 'css/common.css' %}">
+    <link rel="stylesheet" href="{% static 'css/user_signup.css' %}">
 </head>
-<body>
+<body class="auth-page signup-page">
+    <main class="signup-wrap">
+        <section class="signup-book" aria-labelledby="signup-title">
+            <aside class="signup-visual">
+                <a class="signup-logo" href="/" aria-label="MODI 메인으로 이동">
+                    <img src="{% static 'images/modi-icon.svg' %}" alt="">
+                </a>
+                <div class="visual-caption">
+                    <span class="visual-overline">TEAM WORKSPACE</span>
+                    <h1>MODI</h1>
+                    <p>회의록과 업무를<br>한곳에서 관리하세요.</p>
+                </div>
+                <div class="visual-index">
+                    <span>MEETING</span><i></i><span>TASK</span><i></i><span>TEAM</span>
+                </div>
+                <div class="visual-arch arch-one"></div>
+                <div class="visual-arch arch-two"></div>
+                <div class="visual-arch arch-three"></div>
+                <div class="visual-arch arch-four"></div>
+                <div class="visual-arch arch-five"></div>
+            </aside>
 
-    <div>
-    <!-- 뒤로가기 (로그인 페이지) -->
-    <a href="/user/login">로그인</a>
+            <section class="signup-form-panel">
+                <div class="signup-top">
+                    <div>
+                        <span class="signup-kicker">CREATE ACCOUNT</span>
+                        <h2 id="signup-title">회원가입</h2>
+                    </div>
+                </div>
 
-    <h1>회원가입</h1>
+                {% if messages %}
+                    <div class="auth-messages" role="alert" aria-live="polite">
+                        {% for message in messages %}<p>{{ message }}</p>{% endfor %}
+                    </div>
+                {% endif %}
 
-    <div>
-        {% csrf_token %}
+                <form class="signup-form" onsubmit="event.preventDefault(); signUp();">
+                    {% csrf_token %}
+                    <div class="signup-fields">
+                        <div class="form-group">
+                            <label class="form-label" for="inputUsername">아이디 <span class="required-mark">*</span></label>
+                            <input class="input signup-input" id="inputUsername" type="text" name="username"
+                                   placeholder="아이디를 입력해 주세요" autocomplete="username" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="inputName">이름</label>
+                            <input class="input signup-input" id="inputName" type="text" name="name"
+                                   placeholder="이름을 입력해 주세요" autocomplete="name">
+                        </div>
+                        <div class="form-group signup-field-wide">
+                            <label class="form-label" for="inputEmail">이메일 <span class="required-mark">*</span></label>
+                            <input class="input signup-input" id="inputEmail" type="text" name="email"
+                                   placeholder="이메일 주소를 입력해 주세요" autocomplete="email" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="inputPassword">비밀번호 <span class="required-mark">*</span></label>
+                            <input class="input signup-input" id="inputPassword" type="password" name="password"
+                                   placeholder="영문·숫자·특수문자 포함 8자 이상" autocomplete="new-password" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="confirmPassword">비밀번호 확인 <span class="required-mark">*</span></label>
+                            <input class="input signup-input" id="confirmPassword" type="password" name="confirm_password"
+                                   placeholder="비밀번호를 다시 입력해 주세요" autocomplete="new-password" required>
+                        </div>
+                    </div>
 
-        <div>
-            <label for="inputUsername">아이디</label>
-            <input id="inputUsername" type="text" name="username" placeholder="아이디" autocomplete="off">
-        </div>
+                    <p class="password-guide">영문, 숫자, 특수문자를 조합해 8자 이상 입력해 주세요.</p>
+                    <button class="btn btn-primary btn-lg btn-block signup-submit" type="submit">회원가입</button>
+                </form>
 
-        <div>
-            <label for="inputName">이름</label>
-            <input id="inputName" type="text" name="name" placeholder="이름" autocomplete="off">
-        </div>
-
-        <div>
-            <label for="inputEmail">이메일</label>
-            <input id="inputEmail" type="text" name="email" placeholder="crms@kdance.or.kr" autocomplete="off">
-        </div>
-
-        <div>
-            <label for="inputPassword">비밀번호</label>
-            <input id="inputPassword" type="password" name="password" placeholder="••••••••">
-        </div>
-
-        <div>
-            <label for="confirmPassword">비밀번호 확인</label>
-            <input id="confirmPassword" type="password" name="confirm_password" placeholder="••••••••">
-        </div>
-
-        <!-- 에러 메시지 출력 -->
-        {% if messages %}
-            {% for message in messages %}
-                <p>{{ message }}</p>
-            {% endfor %}
-        {% endif %}
-    </div>
-
-    <!-- 회원가입 버튼 -->
-    <button class="btn btn-primary" type="button" onclick="signUp()">회원가입</button>
-</div>
-
-
+                <p class="signup-bottom">이미 계정이 있으신가요? <a href="/user/login/">로그인하기</a></p>
+            </section>
+        </section>
+        <p class="signup-copyright">© MODI</p>
+    </main>
 </body>
 <script>
-    /* 유횽성 검사 */
+    /* 회원가입 입력값 확인 */
     function inputValid() {
-        if (document.getElementById('inputUsername').value === "") {
-            alert("아이디는 필수 입력값입니다.");
-            document.getElementById('inputUsername').focus();
-            return false;
-        }
-        if (document.getElementById('inputEmail').value === "") {
-            alert("이메일은 필수 입력값입니다.");
-            document.getElementById('inputEmail').focus();
-            return false;
-        }
-
+        const username = document.getElementById('inputUsername');
+        const email = document.getElementById('inputEmail');
         const pw = document.getElementById('inputPassword');
         const conPw = document.getElementById('confirmPassword');
 
-        if (pw.value !== "" || conPw.value !== "") {
+        if (username.value.trim() === '') {
+            alert('아이디는 필수 입력값입니다.');
+            username.focus();
+            return false;
+        }
+        if (email.value.trim() === '') {
+            alert('이메일은 필수 입력값입니다.');
+            email.focus();
+            return false;
+        }
+        if (pw.value === '') {
+            alert('비밀번호를 입력해주세요.');
+            pw.focus();
+            return false;
+        }
+        if (conPw.value === '') {
+            alert('비밀번호 확인을 입력해주세요.');
+            conPw.focus();
+            return false;
+        }
 
-            if (pw.value === "") {
-                alert("비밀번호를 입력해주세요.");
-                pw.focus();
-                return false;
-            }
-
-            if (conPw.value === "") {
-                alert("비밀번호 확인을 입력해주세요.");
-                conPw.focus();
-                return false;
-            }
-
-            const pwRegex = /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[!@#$%^&*()_+~`\-={}[\]:;"'<>,.?/]).{8,}$/;
-            if (!pwRegex.test(pw.value)) {
-                alert("비밀번호는 영문, 숫자, 특수문자 조합 8자 이상이어야 합니다.");
-                pw.focus();
-                return false;
-            }
-
-            if (pw.value !== conPw.value) {
-                alert("비밀번호가 일치하지 않습니다.");
-                conPw.focus();
-                return false;
-            }
+        const pwRegex = /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[!@#$%^&*()_+~`\-={}\[\]:;"'<>,.?\/]).{8,}$/;
+        if (!pwRegex.test(pw.value)) {
+            alert('비밀번호는 영문, 숫자, 특수문자 조합 8자 이상이어야 합니다.');
+            pw.focus();
+            return false;
+        }
+        if (pw.value !== conPw.value) {
+            alert('비밀번호가 일치하지 않습니다.');
+            conPw.focus();
+            return false;
         }
         return true;
     }
 
     async function signUp() {
-        if (!inputValid()) {
-            return;
-        }
+        if (!inputValid()) return;
 
         const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
         if (!csrfToken) {
+            alert('보안 토큰을 확인할 수 없습니다. 페이지를 새로고침해 주세요.');
             return;
         }
 
@@ -128,30 +145,31 @@
         formData.append('password', document.getElementById('inputPassword').value);
         formData.append('confirm_password', document.getElementById('confirmPassword').value);
 
+        const submitButton = document.querySelector('.signup-submit');
+        submitButton.disabled = true;
+        submitButton.textContent = '가입 처리 중...';
+
         try {
             const response = await fetch('/user/signupAction/', {
                 method: 'POST',
-                headers: {
-                    'X-CSRFToken': csrfToken
-                },
+                headers: { 'X-CSRFToken': csrfToken },
                 body: formData
             });
+            const data = await response.json();
 
             if (response.ok) {
-                const data = await response.json();
-
                 alert('회원가입이 완료되었습니다.');
-                console.log('서버 응답:', data);
                 window.location.href = '/user/login/';
             } else {
-                const data = await response.json();
                 alert(data.message || '회원가입에 실패했습니다. 상태 코드: ' + response.status);
             }
         } catch (error) {
             console.error('API 호출 중 에러 발생:', error);
             alert('서버와 통신 중 문제가 발생했습니다.');
+        } finally {
+            submitButton.disabled = false;
+            submitButton.textContent = '회원가입';
         }
-
     }
 </script>
 </html>

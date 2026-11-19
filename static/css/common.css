@@ -1,3 +1,8 @@
+/*
+ * header, footer, sidebar
+ */
+
+
 /* 공용 폰트 */
 @font-face {
     font-family: 'Paperozi';
@@ -31,6 +36,35 @@
 .site-header .header-logo { text-decoration: none; }
 .site-header .header-login { transition: color .18s ease; }
 .site-header .header-signup { text-decoration: none; }
+
+/* 로그인 후 헤더 */
+.header-user {
+    color: var(--modi-ink);
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.header-actions form {
+    margin: 0;
+}
+
+.header-logout {
+    min-height: 43px;
+    padding: 0 18px;
+    border: 1px solid var(--modi-ink);
+    border-radius: 8px;
+    color: var(--modi-ink);
+    background: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: .2s ease;
+}
+
+.header-logout:hover {
+    color: #fff;
+    background: var(--modi-ink);
+}
 
 /* Header 끝 */
 
