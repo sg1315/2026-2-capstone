@@ -1,0 +1,313 @@
+{% extends 'layouts/workspace.html' %}
+
+{# 프로젝트 생성/수정 공통 화면. mode: 'create' | 'update' #}
+
+{% block title %}{% if mode == 'update' %}프로젝트 수정{% else %}새 프로젝트{% endif %}{% endblock %}
+
+{% block content %}
+
+    <nav class="breadcrumb" aria-label="현재 위치">
+        <a href="{% url 'project_list' %}">프로젝트</a>
+        <span aria-hidden="true">›</span>
+        {% if mode == 'update' %}
+            <a href="{% url 'project_detail' project.id %}">{{ project.title }}</a>
+            <span aria-hidden="true">›</span>
+            <span aria-current="page">수정</span>
+        {% else %}
+            <span aria-current="page">새 프로젝트</span>
+        {% endif %}
+    </nav>
+
+    <header class="page-header">
+        <div>
+            {% if mode == 'update' %}
+                <span class="eyebrow">EDIT PROJECT</span>
+                <h1 class="page-title">프로젝트 수정</h1>
+                <p class="page-description">프로젝트 정보, 해시태그, 첨부파일을 수정할 수 있어요.</p>
+            {% else %}
+                <span class="eyebrow">NEW PROJECT</span>
+                <h1 class="page-title">새 프로젝트 생성</h1>
+                <p class="page-description">프로젝트를 만든 뒤 그 안에서 회의록을 여러 개 생성할 수 있어요.</p>
+            {% endif %}
+        </div>
+    </header>
+
+    <form class="card form-card" id="projectForm" action="{{ action_url }}"
+          data-hashtag-max-count="{{ hashtag_max_count }}" data-hashtag-max-length="{{ hashtag_max_length }}"
+          data-file-extensions="{{ file_extensions }}" data-file-max-size="{{ file_max_size }}"
+          data-file-max-count="{{ file_max_count }}" novalidate>
+        {% csrf_token %}
+        <div class="stack">
+            <div class="alert alert-danger" role="alert" data-form-alert hidden></div>
+
+            <div class="form-group">
+                <label class="form-label" for="title">프로젝트명 <span class="required-mark">*</span></label>
+                <input class="input" type="text" id="title" name="title" value="{{ project.title|default:'' }}"
+                       maxlength="2000" placeholder="예: 2026 하반기 신규 서비스 런칭" required autofocus>
+                <p class="form-error" data-error-for="title" hidden></p>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="hashtags">해시태그</label>
+                <input class="input" type="text" id="hashtags" name="hashtags" value="{{ hashtags_value|default:'' }}"
+                       autocomplete="off" placeholder="예: #기획 #AI #디자인">
+                <p class="form-hint">최대 {{ hashtag_max_count }}개 · 쉼표나 띄어쓰기로 구분 · 프로젝트 검색과 목록 요약에 사용돼요</p>
+                <div class="cluster" id="hashtagPreview" aria-live="polite"></div>
+                <p class="form-error" data-error-for="hashtags" hidden></p>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="content">설명</label>
+                <textarea class="textarea" id="content" name="content"
+                          placeholder="프로젝트 개요나 주요 목표를 적어 주세요.">{{ project.content|default:'' }}</textarea>
+            </div>
+
+            {# 참여자: 사용자를 검색해 추가 (common.js initUserPicker). 선택한 사람은 hidden input member_ids 로 전송 #}
+            <div class="form-group" data-user-picker data-search-url="{% url 'user_search' %}"
+                 data-input-name="member_ids" data-max-count="{{ member_max_count }}">
+                <label class="form-label" for="memberSearch">참여자</label>
+                <div class="user-picker">
+                    <div class="search-field">
+                        <span class="search-icon" aria-hidden="true">⌕</span>
+                        <input type="search" id="memberSearch" data-user-search autocomplete="off"
+                               placeholder="아이디 또는 이름으로 검색해서 추가"
+                               role="combobox" aria-expanded="false" aria-controls="memberResults" aria-autocomplete="list">
+                    </div>
+                    <ul class="user-results" id="memberResults" role="listbox" data-user-results hidden></ul>
+                </div>
+                <div class="user-chips">
+                    <span class="user-chip is-fixed" title="프로젝트를 만든 사람은 항상 참여자입니다">
+                        <span class="avatar">{{ user.name|default:user.username|first }}</span>
+                        <span>{{ user.name|default:user.username }} (나 · 생성자)</span>
+                    </span>
+                    <span class="user-chips" data-user-selected>{% for member in members %}<span class="user-chip" data-user-id="{{ member.id }}"><span class="avatar">{{ member.name|default:member.username|first }}</span><span>{% if member.name %}{{ member.name }} (@{{ member.username }}){% else %}@{{ member.username }}{% endif %}</span><button type="button" class="user-chip-remove" aria-label="{{ member.name|default:member.username }} 빼기">✕</button><input type="hidden" name="member_ids" value="{{ member.id }}"></span>{% endfor %}</span>
+                </div>
+                <p class="form-hint">추가한 사람은 프로젝트와 회의록을 함께 볼 수 있어요 · 최대 {{ member_max_count }}명</p>
+                <p class="form-error" data-error-for="member_ids" hidden></p>
+            </div>
+
+            <div class="grid grid-2">
+                <div class="form-group">
+                    <label class="form-label" for="start_at">시작일</label>
+                    <input class="input" type="date" id="start_at" name="start_at" value="{{ project.start_at|date:'Y-m-d' }}">
+                    <p class="form-error" data-error-for="start_at" hidden></p>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="end_at">종료일</label>
+                    <input class="input" type="date" id="end_at" name="end_at" value="{{ project.end_at|date:'Y-m-d' }}">
+                    <p class="form-error" data-error-for="end_at" hidden></p>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="files">첨부파일</label>
+
+                {% if project_files %}
+                    {# 수정: 기존 첨부파일. 체크하면 저장할 때 삭제된다 (remove_file_ids) #}
+                    <ul class="file-list" id="existingFiles">
+                        {% for file in project_files %}
+                            <li>
+                                <span class="file-icon" aria-hidden="true">{% if file.doc_type == '1' %}♪{% else %}▤{% endif %}</span>
+                                <span class="file-name">{{ file.name }}</span>
+                                <span class="text-muted">{{ file.size|filesizeformat }}</span>
+                                <label class="form-check">
+                                    <input type="checkbox" name="remove_file_ids" value="{{ file.id }}">
+                                    <span>삭제</span>
+                                </label>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+
+                <div class="file-drop" data-file-drop>
+                    <input type="file" id="files" name="files" multiple accept="{{ file_extensions }}">
+                    <span class="file-drop-icon" aria-hidden="true">⇪</span>
+                    <span class="file-drop-title">파일을 끌어다 놓거나 <b>클릭해서 선택</b></span>
+                    <span class="file-drop-hint">문서·이미지·압축·음성파일 · {% if project_files %}기존 파일 포함 {% endif %}최대 {{ file_max_count }}개 · 파일당 {{ file_max_size|filesizeformat }}</span>
+                </div>
+                <ul class="file-list" id="filePreview" hidden></ul>
+                <p class="form-error" data-error-for="files" hidden></p>
+            </div>
+
+            <!-- 첨부파일 업로드 진행률 (전송 중에만 표시) -->
+            <div class="form-group" id="uploadProgress" hidden>
+                <div class="progress"><div class="progress-bar" id="uploadProgressBar"></div></div>
+                <p class="form-hint text-right" id="uploadProgressText">0%</p>
+            </div>
+
+            <hr class="divider">
+
+            <div class="cluster justify-end">
+                <a class="btn btn-secondary" href="{{ cancel_url }}">취소</a>
+                <button class="btn btn-primary" type="submit">{% if mode == 'update' %}수정 저장{% else %}프로젝트 생성{% endif %}</button>
+            </div>
+        </div>
+    </form>
+
+{% endblock %}
+
+{% block script %}
+<script>
+    /* 프로젝트 생성/수정: 입력값·해시태그·첨부파일 확인 후 form action(createAction/updateAction)으로 전송 (common.js submitForm) */
+    const projectForm = document.getElementById('projectForm');
+    const hashtagInput = document.getElementById('hashtags');
+    const hashtagPreview = document.getElementById('hashtagPreview');
+    const fileInput = document.getElementById('files');
+    const filePreview = document.getElementById('filePreview');
+
+    const HASHTAG_MAX_COUNT = Number(projectForm.dataset.hashtagMaxCount);
+    const HASHTAG_MAX_LENGTH = Number(projectForm.dataset.hashtagMaxLength);
+    const HASHTAG_PATTERN = /^[0-9A-Za-z가-힣ㄱ-ㅎㅏ-ㅣ_]+$/;
+    const FILE_EXTENSIONS = projectForm.dataset.fileExtensions.split(',');
+    const FILE_MAX_SIZE = Number(projectForm.dataset.fileMaxSize);
+    const FILE_MAX_COUNT = Number(projectForm.dataset.fileMaxCount);
+
+    const progressBox = document.getElementById('uploadProgress');
+    const progressBar = document.getElementById('uploadProgressBar');
+    const progressText = document.getElementById('uploadProgressText');
+
+    /* ---------- 해시태그 ---------- */
+
+    /** '#기획, 디자인 #AI' -> ['기획', '디자인', 'AI'] (서버 parse_hashtags 와 같은 규칙) */
+    function parseHashtags(raw) {
+        const tags = [];
+        const seen = new Set();
+        raw.split(/[\s,]+/).forEach((token) => {
+            const tag = token.replace(/^#+/, '').trim();
+            if (!tag || seen.has(tag.toLowerCase())) return;
+            seen.add(tag.toLowerCase());
+            tags.push(tag);
+        });
+        return tags;
+    }
+
+    function validateHashtags(tags) {
+        if (tags.length > HASHTAG_MAX_COUNT) return '해시태그는 최대 ' + HASHTAG_MAX_COUNT + '개까지 입력할 수 있습니다.';
+        for (const tag of tags) {
+            if (tag.length > HASHTAG_MAX_LENGTH) return '해시태그는 ' + HASHTAG_MAX_LENGTH + '자 이하로 입력해 주세요. (#' + tag + ')';
+            if (!HASHTAG_PATTERN.test(tag)) return '해시태그는 한글, 영문, 숫자, _ 만 사용할 수 있습니다. (#' + tag + ')';
+        }
+        return null;
+    }
+
+    // 입력하는 대로 태그 미리보기 (textContent 로 넣어 HTML 이 실행되지 않게)
+    function renderHashtagPreview() {
+        const tags = parseHashtags(hashtagInput.value);
+        hashtagPreview.replaceChildren(...tags.map((tag, i) => {
+            const chip = document.createElement('span');
+            chip.className = 'badge ' + (i < HASHTAG_MAX_COUNT ? 'badge-brand' : 'badge-danger');
+            chip.textContent = '#' + tag;
+            return chip;
+        }));
+    }
+    hashtagInput.addEventListener('input', renderHashtagPreview);
+    renderHashtagPreview();
+
+    /* ---------- 첨부파일 ---------- */
+
+    function formatSize(bytes) {
+        if (bytes >= 1024 * 1024) return (bytes / (1024 * 1024)).toFixed(1) + 'MB';
+        if (bytes >= 1024) return (bytes / 1024).toFixed(1) + 'KB';
+        return bytes + 'B';
+    }
+
+    function validateFile(file) {
+        const dot = file.name.lastIndexOf('.');
+        const ext = dot >= 0 ? file.name.slice(dot).toLowerCase() : '';
+        if (!FILE_EXTENSIONS.includes(ext)) return '첨부할 수 없는 형식입니다. (' + file.name + ')';
+        if (file.size > FILE_MAX_SIZE) return '파일당 ' + formatSize(FILE_MAX_SIZE) + ' 이하만 첨부할 수 있습니다. (' + file.name + ')';
+        return null;
+    }
+
+    /** (수정 화면) 삭제 체크하지 않은 기존 첨부파일 수 */
+    function keptFileCount() {
+        const boxes = projectForm.querySelectorAll('input[name="remove_file_ids"]');
+        return Array.from(boxes).filter((box) => !box.checked).length;
+    }
+
+    function validateFiles(files) {
+        if (keptFileCount() + files.length > FILE_MAX_COUNT) {
+            return '첨부파일은 기존 파일을 포함해 최대 ' + FILE_MAX_COUNT + '개까지 올릴 수 있습니다.';
+        }
+        for (const file of files) {
+            const error = validateFile(file);
+            if (error) return error;
+        }
+        return null;
+    }
+
+    function showFileCountError() {
+        const errorBox = projectForm.querySelector('[data-error-for="files"]');
+        const error = validateFiles(Array.from(fileInput.files));
+        errorBox.textContent = error || '';
+        errorBox.hidden = !error;
+    }
+
+    // (수정 화면) 기존 파일 삭제 체크를 바꾸면 개수 제한 다시 확인
+    projectForm.querySelectorAll('input[name="remove_file_ids"]').forEach((box) => {
+        box.addEventListener('change', showFileCountError);
+    });
+
+    // 선택한 파일 목록 미리보기 + 즉시 검사
+    fileInput.addEventListener('change', () => {
+        const files = Array.from(fileInput.files);
+        filePreview.replaceChildren(...files.map((file) => {
+            const li = document.createElement('li');
+            const name = document.createElement('span');
+            name.className = 'file-name';
+            name.textContent = file.name;
+            const size = document.createElement('span');
+            size.className = 'text-muted';
+            size.textContent = formatSize(file.size);
+            li.append(name, size);
+            if (validateFile(file)) li.classList.add('is-invalid');
+            return li;
+        }));
+        filePreview.hidden = files.length === 0;
+        showFileCountError();
+    });
+
+    /* ---------- 전송 ---------- */
+
+    function validateProjectForm(form) {
+        const errors = {};
+        const startAt = form.elements.start_at.value;
+        const endAt = form.elements.end_at.value;
+
+        if (!form.elements.title.value.trim()) errors.title = '프로젝트명을 입력해 주세요.';
+        // date input 값은 YYYY-MM-DD 형식이라 문자열 비교로 순서를 알 수 있다
+        if (startAt && endAt && endAt < startAt) errors.end_at = '종료일은 시작일 이후여야 합니다.';
+
+        const hashtagError = validateHashtags(parseHashtags(hashtagInput.value));
+        if (hashtagError) errors.hashtags = hashtagError;
+
+        const fileError = validateFiles(Array.from(fileInput.files));
+        if (fileError) errors.files = fileError;
+        return errors;
+    }
+
+    function updateProgress(percent) {
+        progressBar.style.width = percent + '%';
+        progressText.textContent = percent < 100 ? '업로드 중 ' + percent + '%' : '저장 중...';
+    }
+
+    projectForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const hasFiles = fileInput.files.length > 0;
+
+        submitForm(projectForm, {
+            url: projectForm.action,
+            validate: validateProjectForm,
+            busyText: hasFiles ? '업로드 중...' : '생성 중...',
+            onProgress: hasFiles ? (percent) => {
+                progressBox.hidden = false;
+                updateProgress(percent);
+            } : null,
+            onFail: () => {
+                progressBox.hidden = true;
+                updateProgress(0);
+            },
+        });
+    });
+</script>
+{% endblock %}

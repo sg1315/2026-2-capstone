@@ -8,17 +8,65 @@
     <title>회원가입 | MODI</title>
     <link rel="icon" type="image/svg+xml" href="{% static 'images/modi-icon.svg' %}">
     <link rel="stylesheet" href="{% static 'css/app.css' %}">
-    <link rel="stylesheet" href="{% static 'css/user_signup.css' %}">
+    <link rel="stylesheet" href="{% static 'css/common.css' %}">
+    <style>
+        /* 회원가입 페이지 전용 (공통 스타일은 app.css / common.css 의 .auth-*) */
+        .signup-card {
+            display: grid;
+            width: min(1120px, 100%);
+            min-height: 680px;
+            grid-template-columns: .95fr 1.05fr;
+        }
+        .signup-form-panel {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 58px 70px 42px;
+        }
+
+        /* 왼쪽 브랜드 영역 */
+        .signup-visual {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            padding: 34px 38px;
+            color: #fff;
+            background: linear-gradient(145deg, var(--color-brand-700) 0%, var(--modi-ink) 60%, var(--color-brand-900) 100%);
+            isolation: isolate;
+        }
+        .signup-visual .auth-logo img { width: 34px; height: 34px; }
+        .visual-caption { position: relative; z-index: 2; margin: auto 0; padding-left: 8px; }
+        .visual-caption .eyebrow { color: var(--color-brand-300); }
+        .visual-caption h1 { margin: 13px 0 12px; color: #fff; font-size: 48px; letter-spacing: .02em; }
+        .visual-caption p { margin: 0; color: rgba(255,255,255,.82); font-size: 17px; line-height: 1.75; }
+        .visual-index { position: relative; z-index: 2; display: flex; align-items: center; gap: 10px; color: rgba(255,255,255,.65); font-size: 9px; letter-spacing: .15em; }
+        .visual-index i { width: 3px; height: 3px; border-radius: 50%; background: var(--color-brand-300); }
+        .visual-arch {
+            position: absolute; z-index: 1; top: 50%; left: 50%;
+            border: 1px solid rgba(184,221,251,.55); border-radius: 48% 48% 0 0;
+            transform: translate(-50%,-36%); pointer-events: none;
+        }
+        .arch-one { width: 56%; height: 112%; opacity: .55; }
+        .arch-two { width: 72%; height: 126%; opacity: .42; }
+        .arch-three { width: 88%; height: 140%; opacity: .32; }
+        .arch-four { width: 104%; height: 154%; opacity: .24; }
+        .arch-five { width: 120%; height: 168%; opacity: .17; }
+
+        @media (max-width: 1100px) {
+            .signup-form-panel { padding-inline: 44px; }
+        }
+    </style>
 </head>
-<body class="auth-page signup-page">
-    <main class="signup-wrap">
-        <section class="signup-book" aria-labelledby="signup-title">
+<body class="auth-page">
+    <main class="auth-wrap">
+        <section class="auth-card signup-card" aria-labelledby="signup-title">
             <aside class="signup-visual">
-                <a class="signup-logo" href="/" aria-label="MODI 메인으로 이동">
+                <a class="auth-logo" href="{{ home_url }}" aria-label="MODI 메인으로 이동">
                     <img src="{% static 'images/modi-icon.svg' %}" alt="">
                 </a>
                 <div class="visual-caption">
-                    <span class="visual-overline">TEAM WORKSPACE</span>
+                    <span class="eyebrow">TEAM WORKSPACE</span>
                     <h1>MODI</h1>
                     <p>회의록과 업무를<br>한곳에서 관리하세요.</p>
                 </div>
@@ -33,57 +81,55 @@
             </aside>
 
             <section class="signup-form-panel">
-                <div class="signup-top">
-                    <div>
-                        <span class="signup-kicker">CREATE ACCOUNT</span>
-                        <h2 id="signup-title">회원가입</h2>
-                    </div>
+                <div class="auth-heading">
+                    <span class="eyebrow">CREATE ACCOUNT</span>
+                    <h2 id="signup-title">회원가입</h2>
                 </div>
 
                 {% if messages %}
-                    <div class="auth-messages" role="alert" aria-live="polite">
+                    <div class="alert alert-danger alert-stack auth-alert" role="alert" aria-live="polite">
                         {% for message in messages %}<p>{{ message }}</p>{% endfor %}
                     </div>
                 {% endif %}
 
-                <form class="signup-form" onsubmit="event.preventDefault(); signUp();">
+                <form class="auth-form" onsubmit="event.preventDefault(); signUp();">
                     {% csrf_token %}
-                    <div class="signup-fields">
+                    <div class="grid grid-2">
                         <div class="form-group">
                             <label class="form-label" for="inputUsername">아이디 <span class="required-mark">*</span></label>
-                            <input class="input signup-input" id="inputUsername" type="text" name="username"
+                            <input class="input" id="inputUsername" type="text" name="username"
                                    placeholder="아이디를 입력해 주세요" autocomplete="username" required>
                         </div>
                         <div class="form-group">
                             <label class="form-label" for="inputName">이름</label>
-                            <input class="input signup-input" id="inputName" type="text" name="name"
+                            <input class="input" id="inputName" type="text" name="name"
                                    placeholder="이름을 입력해 주세요" autocomplete="name">
                         </div>
-                        <div class="form-group signup-field-wide">
+                        <div class="form-group col-span-full">
                             <label class="form-label" for="inputEmail">이메일 <span class="required-mark">*</span></label>
-                            <input class="input signup-input" id="inputEmail" type="text" name="email"
+                            <input class="input" id="inputEmail" type="text" name="email"
                                    placeholder="이메일 주소를 입력해 주세요" autocomplete="email" required>
                         </div>
                         <div class="form-group">
                             <label class="form-label" for="inputPassword">비밀번호 <span class="required-mark">*</span></label>
-                            <input class="input signup-input" id="inputPassword" type="password" name="password"
+                            <input class="input" id="inputPassword" type="password" name="password"
                                    placeholder="영문·숫자·특수문자 포함 8자 이상" autocomplete="new-password" required>
                         </div>
                         <div class="form-group">
                             <label class="form-label" for="confirmPassword">비밀번호 확인 <span class="required-mark">*</span></label>
-                            <input class="input signup-input" id="confirmPassword" type="password" name="confirm_password"
+                            <input class="input" id="confirmPassword" type="password" name="confirm_password"
                                    placeholder="비밀번호를 다시 입력해 주세요" autocomplete="new-password" required>
                         </div>
                     </div>
 
-                    <p class="password-guide">영문, 숫자, 특수문자를 조합해 8자 이상 입력해 주세요.</p>
+                    <p class="form-hint">영문, 숫자, 특수문자를 조합해 8자 이상 입력해 주세요.</p>
                     <button class="btn btn-primary btn-lg btn-block signup-submit" type="submit">회원가입</button>
                 </form>
 
-                <p class="signup-bottom">이미 계정이 있으신가요? <a href="/user/login/">로그인하기</a></p>
+                <p class="auth-footer">이미 계정이 있으신가요? <a href="{% url 'user_login' %}">로그인하기</a></p>
             </section>
         </section>
-        <p class="signup-copyright">© MODI</p>
+        <p class="auth-copyright">© MODI</p>
     </main>
 </body>
 
@@ -151,7 +197,7 @@
         submitButton.textContent = '가입 처리 중...';
 
         try {
-            const response = await fetch('/user/signupAction/', {
+            const response = await fetch('{% url 'user_signup_action' %}', {
                 method: 'POST',
                 headers: { 'X-CSRFToken': csrfToken },
                 body: formData
@@ -160,7 +206,7 @@
 
             if (response.ok) {
                 alert('회원가입이 완료되었습니다.');
-                window.location.href = '/user/login/';
+                window.location.href = '{% url 'user_login' %}';
             } else {
                 alert(data.message || '회원가입에 실패했습니다. 상태 코드: ' + response.status);
             }

@@ -1,0 +1,196 @@
+{% extends 'layouts/workspace.html' %}
+
+{# 회의록 생성/수정 공통 화면. mode: 'create' | 'update' #}
+
+{% block title %}{% if mode == 'update' %}회의록 수정{% else %}새 회의록{% endif %} · {{ project.title }}{% endblock %}
+
+{% block content %}
+
+    <nav class="breadcrumb" aria-label="현재 위치">
+        <a href="{% url 'project_list' %}">프로젝트</a>
+        <span aria-hidden="true">›</span>
+        <a href="{% url 'project_detail' project.id %}">{{ project.title }}</a>
+        <span aria-hidden="true">›</span>
+        {% if mode == 'update' %}
+            <a href="{% url 'minutes_detail' project.id minutes.id %}">{{ minutes.title }}</a>
+            <span aria-hidden="true">›</span>
+            <span aria-current="page">수정</span>
+        {% else %}
+            <span aria-current="page">새 회의록</span>
+        {% endif %}
+    </nav>
+
+    <header class="page-header">
+        <div>
+            {% if mode == 'update' %}
+                <span class="eyebrow">EDIT MINUTES</span>
+                <h1 class="page-title">회의록 수정</h1>
+                <p class="page-description">'{{ project.title }}' 프로젝트의 회의록을 수정합니다.</p>
+            {% else %}
+                <span class="eyebrow">NEW MINUTES</span>
+                <h1 class="page-title">새 회의록 생성</h1>
+                <p class="page-description">'{{ project.title }}' 프로젝트에 회의록을 추가합니다.</p>
+            {% endif %}
+        </div>
+    </header>
+
+    <form class="card form-card" id="minutesForm" action="{{ action_url }}"
+          data-audio-max-size="{{ audio_max_size }}" data-audio-extensions="{{ audio_extensions }}" novalidate>
+        {% csrf_token %}
+        <div class="stack">
+            <div class="alert alert-danger" role="alert" data-form-alert hidden></div>
+
+            <div class="form-group">
+                <label class="form-label" for="title">회의록 제목 <span class="required-mark">*</span></label>
+                <input class="input" type="text" id="title" name="title" value="{{ minutes.title|default:'' }}"
+                       maxlength="2000" placeholder="예: 3차 스프린트 API 연동 점검 회의" required autofocus>
+                <p class="form-error" data-error-for="title" hidden></p>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="content">회의 내용 <span class="required-mark">*</span></label>
+                <textarea class="textarea" id="content" name="content" rows="14" required
+                          placeholder="회의에서 논의된 안건과 결정 사항을 입력해 주세요.">{{ minutes.content|default:'' }}</textarea>
+                <p class="form-error" data-error-for="content" hidden></p>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="audio">회의 음성파일</label>
+
+                {% if audio_files %}
+                    {# 수정: 기존 음성파일. 체크하면 삭제, 새 파일을 고르면 교체된다 #}
+                    <ul class="file-list">
+                        {% for file in audio_files %}
+                            <li>
+                                <span class="file-icon" aria-hidden="true">♪</span>
+                                <span class="file-name">{{ file.name }}</span>
+                                <span class="text-muted">{{ file.size|filesizeformat }}</span>
+                                <label class="form-check">
+                                    <input type="checkbox" name="remove_file_ids" value="{{ file.id }}">
+                                    <span>삭제</span>
+                                </label>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+
+                <div class="file-drop" data-file-drop>
+                    <input type="file" id="audio" name="audio" accept="{{ audio_extensions }},audio/*">
+                    <span class="file-drop-icon" aria-hidden="true">♪</span>
+                    <span class="file-drop-title" id="audioTitle">음성파일을 끌어다 놓거나 <b>클릭해서 선택</b></span>
+                    <span class="file-drop-hint" id="audioHint">mp3, m4a, wav, webm, ogg, aac, flac · 최대 {{ audio_max_size|filesizeformat }}{% if audio_files %} · 새 파일을 고르면 기존 파일과 교체돼요{% endif %}</span>
+                </div>
+                <p class="form-error" data-error-for="audio" hidden></p>
+            </div>
+
+            <!-- 음성파일 업로드 진행률 (전송 중에만 표시) -->
+            <div class="form-group" id="uploadProgress" hidden>
+                <div class="progress"><div class="progress-bar" id="uploadProgressBar"></div></div>
+                <p class="form-hint text-right" id="uploadProgressText">0%</p>
+            </div>
+
+            <hr class="divider">
+
+            <div class="cluster justify-end">
+                <a class="btn btn-secondary" href="{{ cancel_url }}">취소</a>
+                <button class="btn btn-primary" type="submit">{% if mode == 'update' %}수정 저장{% else %}회의록 저장{% endif %}</button>
+            </div>
+        </div>
+    </form>
+
+{% endblock %}
+
+{% block script %}
+<script>
+    /* 회의록 생성/수정: 입력값·음성파일 확인 후 form action(createAction/updateAction)으로 전송 (common.js submitForm) */
+    const minutesForm = document.getElementById('minutesForm');
+    const audioInput = document.getElementById('audio');
+    const audioTitle = document.getElementById('audioTitle');
+    const audioHint = document.getElementById('audioHint');
+    const audioTitleDefault = audioTitle.innerHTML;
+    const audioHintDefault = audioHint.textContent;
+    const audioMaxSize = Number(minutesForm.dataset.audioMaxSize);
+    const audioExtensions = minutesForm.dataset.audioExtensions.split(',');
+
+    const progressBox = document.getElementById('uploadProgress');
+    const progressBar = document.getElementById('uploadProgressBar');
+    const progressText = document.getElementById('uploadProgressText');
+
+    function formatSize(bytes) {
+        if (bytes >= 1024 * 1024) return (bytes / (1024 * 1024)).toFixed(1) + 'MB';
+        if (bytes >= 1024) return (bytes / 1024).toFixed(1) + 'KB';
+        return bytes + 'B';
+    }
+
+    function validateAudio(file) {
+        const dot = file.name.lastIndexOf('.');
+        const ext = dot >= 0 ? file.name.slice(dot).toLowerCase() : '';
+        if (!audioExtensions.includes(ext)) {
+            return '음성파일은(는) ' + audioExtensions.map((e) => e.slice(1)).join(', ') + ' 형식만 첨부할 수 있습니다. (' + file.name + ')';
+        }
+        if (file.size > audioMaxSize) {
+            return '음성파일은(는) ' + formatSize(audioMaxSize) + ' 이하만 첨부할 수 있습니다. (' + file.name + ')';
+        }
+        return null;
+    }
+
+    function validateMinutesForm(form) {
+        const errors = {};
+        if (!form.elements.title.value.trim()) errors.title = '회의록 제목을 입력해 주세요.';
+        if (!form.elements.content.value.trim()) errors.content = '회의 내용을 입력해 주세요.';
+        const file = audioInput.files[0];
+        if (file) {
+            const audioError = validateAudio(file);
+            if (audioError) errors.audio = audioError;
+        }
+        return errors;
+    }
+
+    // 파일을 고르면 바로 검사하고, 드롭존에 선택한 파일 이름/크기를 보여준다
+    audioInput.addEventListener('change', () => {
+        const file = audioInput.files[0];
+        const errorBox = minutesForm.querySelector('[data-error-for="audio"]');
+        errorBox.hidden = true;
+
+        if (!file) {
+            audioTitle.innerHTML = audioTitleDefault;
+            audioHint.textContent = audioHintDefault;
+            return;
+        }
+        const audioError = validateAudio(file);
+        if (audioError) {
+            errorBox.textContent = audioError;
+            errorBox.hidden = false;
+            audioTitle.innerHTML = audioTitleDefault;
+            audioHint.textContent = audioHintDefault;
+        } else {
+            audioTitle.textContent = file.name;
+            audioHint.textContent = formatSize(file.size) + ' · 다른 파일로 바꾸려면 다시 클릭하세요';
+        }
+    });
+
+    function updateProgress(percent) {
+        progressBar.style.width = percent + '%';
+        progressText.textContent = percent < 100 ? '업로드 중 ' + percent + '%' : '저장 중...';
+    }
+
+    minutesForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const hasAudio = audioInput.files.length > 0;
+
+        submitForm(minutesForm, {
+            url: minutesForm.action,
+            validate: validateMinutesForm,
+            busyText: hasAudio ? '업로드 중...' : '저장 중...',
+            onProgress: hasAudio ? (percent) => {
+                progressBox.hidden = false;
+                updateProgress(percent);
+            } : null,
+            onFail: () => {
+                progressBox.hidden = true;
+                updateProgress(0);
+            },
+        });
+    });
+</script>
+{% endblock %}

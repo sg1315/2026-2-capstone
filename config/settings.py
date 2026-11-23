@@ -70,6 +70,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'front.context_processors.sidebar',
             ],
         },
     },
@@ -126,6 +127,12 @@ STATICFILES_DIRS = [
 
 # User
 AUTH_USER_MODEL = 'base.User'
+
+# 로그인 이동 규칙
+#   로그인 안 됨 -> 메인 페이지 / 로그인 됨 -> 프로젝트 목록
+LOGIN_URL = 'main'                    # 로그인이 필요한 페이지에 비로그인으로 접근하면 이동
+LOGIN_REDIRECT_URL = 'project_list'   # 로그인 후 이동 (메인 페이지도 로그인 상태면 여기로)
+LOGOUT_REDIRECT_URL = 'main'          # 로그아웃 후 이동
 
 # Media
 MEDIA_URL = '/media/'

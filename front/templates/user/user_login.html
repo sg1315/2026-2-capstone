@@ -8,55 +8,59 @@
     <title>로그인 | MODI</title>
     <link rel="icon" type="image/svg+xml" href="{% static 'images/modi-icon.svg' %}">
     <link rel="stylesheet" href="{% static 'css/app.css' %}">
-    <link rel="stylesheet" href="{% static 'css/user_login.css' %}">
+    <link rel="stylesheet" href="{% static 'css/common.css' %}">
+    <style>
+        /* 로그인 페이지 전용 (공통 스타일은 app.css / common.css 의 .auth-*) */
+        .login-card { width: 470px; padding: 42px 48px 34px; }
+        .login-card .auth-logo { display: flex; justify-content: center; margin-bottom: 34px; }
+        .login-card .auth-heading { text-align: center; }
+    </style>
 </head>
-<body class="auth-page login-page">
-    <main class="login-wrap">
-        <section class="login-card" aria-labelledby="login-title">
-            <a class="login-logo" href="/" aria-label="MODI 메인으로 이동">
+<body class="auth-page">
+    <main class="auth-wrap">
+        <section class="auth-card login-card" aria-labelledby="login-title">
+            <a class="auth-logo" href="{{ home_url }}" aria-label="MODI 메인으로 이동">
                 <img src="{% static 'images/modi-icon.svg' %}" alt="">
             </a>
 
-            <div class="login-heading">
-                <span class="login-kicker">LOGIN</span>
+            <div class="auth-heading">
+                <span class="eyebrow">LOGIN</span>
                 <h1 id="login-title">로그인</h1>
             </div>
 
             {% if messages %}
-                <div class="auth-messages" role="alert" aria-live="polite">
+                <div class="alert alert-danger alert-stack auth-alert" role="alert" aria-live="polite">
                     {% for message in messages %}<p>{{ message }}</p>{% endfor %}
                 </div>
             {% endif %}
 
-            <form class="login-form" method="POST" action="">
+            <form class="auth-form" method="POST" action="">
                 {% csrf_token %}
                 <div class="form-group">
                     <label class="form-label" for="username">아이디</label>
-                    <input class="input login-input" type="text" id="username" name="username"
+                    <input class="input" type="text" id="username" name="username"
                            placeholder="아이디를 입력해 주세요" autocomplete="username" required autofocus>
                 </div>
                 <div class="form-group">
                     <label class="form-label" for="password">비밀번호</label>
-                    <input class="input login-input" type="password" id="password" name="password"
+                    <input class="input" type="password" id="password" name="password"
                            placeholder="비밀번호를 입력해 주세요" autocomplete="current-password" required>
                 </div>
 
-                <div class="login-options">
-                    <label class="remember-option" for="remember_session">
-                        <input type="checkbox" id="remember_session" name="remember_session" value="true">
-                        <span>로그인 상태 유지</span>
-                    </label>
-                </div>
+                <label class="form-check" for="remember_session">
+                    <input type="checkbox" id="remember_session" name="remember_session" value="true">
+                    <span>로그인 상태 유지</span>
+                </label>
 
-                <button class="btn btn-primary btn-lg btn-block login-submit" type="submit">로그인</button>
+                <button class="btn btn-primary btn-lg btn-block" type="submit">로그인</button>
             </form>
 
-            <div class="login-footer">
+            <p class="auth-footer">
                 <span>아직 회원이 아니신가요?</span>
-                <a href="/user/signup/">회원가입</a>
-            </div>
+                <a href="{% url 'user_signup' %}">회원가입</a>
+            </p>
         </section>
-        <p class="login-copyright">© MODI</p>
+        <p class="auth-copyright">© MODI</p>
     </main>
 </body>
 </html>

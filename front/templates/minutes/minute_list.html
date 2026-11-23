@@ -1,0 +1,105 @@
+{% extends 'layouts/workspace.html' %}
+
+{% block title %}{{ project.title }}{% endblock %}
+
+{% block content %}
+
+    <nav class="breadcrumb" aria-label="현재 위치">
+        <a href="{% url 'project_list' %}">프로젝트</a>
+        <span aria-hidden="true">›</span>
+        <span aria-current="page">{{ project.title }}</span>
+    </nav>
+
+    <!-- 프로젝트 정보 -->
+    <section class="card mb-4">
+        <header class="page-header mb-0">
+            <div>
+                <span class="eyebrow">PROJECT</span>
+                <h1 class="page-title">{{ project.title }}</h1>
+                {% if project.content %}
+                    <p class="page-description">{{ project.content }}</p>
+                {% endif %}
+                {% if hashtags %}
+                    <div class="tag-list">
+                        {# 해시태그를 누르면 프로젝트 목록에서 해당 태그로 검색 #}
+                        {% for tag in hashtags %}<a class="badge badge-brand" href="{% url 'project_list' %}?q=%23{{ tag.name|urlencode }}">#{{ tag.name }}</a>{% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+            <div class="cluster">
+                {% if is_owner %}
+                    {# 수정/삭제는 프로젝트를 만든 사람에게만 표시 (서버에서도 다시 확인) #}
+                    <a class="btn btn-secondary" href="{% url 'project_update' project.id %}">수정</a>
+                    <form method="POST" action="{% url 'project_delete_action' project.id %}"
+                          data-confirm-action="'{{ project.title }}' 프로젝트를 삭제할까요?&#10;프로젝트 안의 회의록과 첨부파일도 더 이상 볼 수 없게 됩니다.">
+                        {% csrf_token %}
+                        <button class="btn btn-danger" type="submit">삭제</button>
+                    </form>
+                {% endif %}
+                <a class="btn btn-primary" href="{% url 'minutes_create' project.id %}">
+                    <span aria-hidden="true">+</span> 새 회의록 생성
+                </a>
+            </div>
+        </header>
+
+        <dl class="meta-list">
+            <div>
+                <dt>기간</dt>
+                <dd>
+                    {% if project.start_at or project.end_at %}
+                        {{ project.start_at|date:"Y.m.d"|default:"미정" }} ~ {{ project.end_at|date:"Y.m.d"|default:"미정" }}
+                    {% else %}
+                        미정
+                    {% endif %}
+                </dd>
+            </div>
+            <div>
+                <dt>생성일</dt>
+                <dd>{{ project.created_at|date:"Y.m.d" }}</dd>
+            </div>
+            <div>
+                <dt>참여 멤버</dt>
+                <dd class="avatar-group">
+                    {% for member in members %}
+                        <span class="avatar" title="{{ member.user.name|default:member.user.username }}">{{ member.user.name|default:member.user.username|first }}</span>
+                    {% endfor %}
+                </dd>
+            </div>
+        </dl>
+
+        {% if project_files %}
+            <div class="mt-4">
+                <h2 class="form-label">첨부파일 <span class="badge badge-neutral">{{ project_files|length }}</span></h2>
+                <ul class="file-list">
+                    {% for file in project_files %}
+                        {% url 'project_file' project.id file.id as file_url %}
+                        <li>
+                            <span class="file-icon" aria-hidden="true">{% if file.doc_type == '1' %}♪{% else %}▤{% endif %}</span>
+                            <a class="file-name" href="{{ file_url }}" target="_blank" rel="noopener">{{ file.name }}</a>
+                            <span class="text-muted">{{ file.size|filesizeformat }}</span>
+                            <a class="btn btn-secondary btn-sm" href="{{ file_url }}?download=1">다운로드</a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+    </section>
+
+    <!-- 회의록 목록 -->
+    {# data-list-root: common.js 가 검색 입력 시 [data-list-results] 영역만 새로 받아온다 #}
+    <section class="card" data-list-root>
+        <div class="list-toolbar">
+            <h2 class="section-title">회의록 <span class="badge badge-neutral">{{ minutes_total }}</span></h2>
+
+            <form class="search-field" method="GET" role="search" data-list-search>
+                <span class="search-icon" aria-hidden="true">⌕</span>
+                <input type="search" name="q" value="{{ q }}" placeholder="회의록 제목, 내용 검색" aria-label="회의록 검색" autocomplete="off">
+            </form>
+        </div>
+
+        <div data-list-results aria-live="polite">
+            {% include 'minutes/_minute_items.html' %}
+        </div>
+    </section>
+
+{% endblock %}

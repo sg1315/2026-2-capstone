@@ -2,7 +2,7 @@
 
 <header class="site-header">
     <div class="header-inner">
-        <a href="{% url 'main' %}" class="header-logo" aria-label="Modi 홈">
+        <a href="{{ home_url }}" class="header-logo" aria-label="Modi 홈">
             <img src="{% static 'images/modi-icon.svg' %}" alt="">
             <span>Modi</span>
             <span class="brand-beta">WORKSPACE</span>
@@ -24,7 +24,7 @@
 
                 <form method="POST" action="{% url 'user_logout' %}">
                     {% csrf_token %}
-                    <button type="submit" class="header-logout">
+                    <button type="submit" class="btn btn-secondary btn-sm header-logout">
                         <span>로그아웃</span>
                         <svg class="logout-icon" viewBox="0 0 24 24" fill="none">
                             <path d="M10 17L15 12L10 7" />
