@@ -834,3 +834,9 @@ FodyWeavers.xsd
 # Additional files built by Visual Studio
 
 # End of https://www.toptal.com/developers/gitignore/api/windows,linux,macos,python,django,visualstudio,visualstudiocode,jetbrains+all
+
+### Claude Code ###
+.claude/
+CLAUDE.md
+CLAUDE.local.md
+.mcp.json
