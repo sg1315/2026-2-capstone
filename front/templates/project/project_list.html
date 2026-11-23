@@ -1,0 +1,47 @@
+{% extends 'layouts/workspace.html' %}
+
+{% block title %}프로젝트{% endblock %}
+
+{% block content %}
+
+    <header class="page-header">
+        <div>
+            <span class="eyebrow">PROJECTS</span>
+            <h1 class="page-title">프로젝트</h1>
+            <p class="page-description">프로젝트를 선택하면 그 안의 회의록을 확인할 수 있어요.</p>
+        </div>
+    </header>
+
+    <section class="card create-banner">
+        <div>
+            <h2>새 프로젝트 생성</h2>
+            <p>프로젝트 정보를 입력하고 회의록 정리를 시작하세요.</p>
+        </div>
+        <a class="btn btn-primary btn-lg" href="{% url 'project_create' %}">
+            바로 생성 <span aria-hidden="true">↗</span>
+        </a>
+    </section>
+
+    {# data-list-root: common.js 가 검색 입력/탭 클릭 시 [data-list-results] 영역만 새로 받아온다 #}
+    <section class="card" data-list-root>
+        <div class="list-toolbar">
+            <nav class="tabs" role="tablist" aria-label="프로젝트 구분">
+                <a class="tab{% if tab == 'mine' %} is-active{% endif %}" href="?tab=mine" role="tab"
+                   data-list-tab="mine" aria-selected="{% if tab == 'mine' %}true{% else %}false{% endif %}">내가 만든</a>
+                <a class="tab{% if tab == 'shared' %} is-active{% endif %}" href="?tab=shared" role="tab"
+                   data-list-tab="shared" aria-selected="{% if tab == 'shared' %}true{% else %}false{% endif %}">공유 받은</a>
+            </nav>
+
+            <form class="search-field" method="GET" role="search" data-list-search>
+                <input type="hidden" name="tab" value="{{ tab }}">
+                <span class="search-icon" aria-hidden="true">⌕</span>
+                <input type="search" name="q" value="{{ q }}" placeholder="프로젝트명 또는 #해시태그" aria-label="프로젝트명 또는 해시태그 검색" autocomplete="off">
+            </form>
+        </div>
+
+        <div data-list-results aria-live="polite">
+            {% include 'project/_project_items.html' %}
+        </div>
+    </section>
+
+{% endblock %}

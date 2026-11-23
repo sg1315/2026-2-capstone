@@ -16,11 +16,13 @@
         </div>
 
         <nav class="sidebar-nav">
-            <a class="sidebar-link is-active" href="#">
+            {% with url_name=request.resolver_match.url_name %}
+            <a class="sidebar-link{% if url_name in 'project_list project_create project_detail minutes_create minutes_detail' %} is-active{% endif %}" href="{% url 'project_list' %}">
                 <span class="sidebar-icon icon-project" aria-hidden="true">▦</span>
                 <span>프로젝트</span>
-                <span class="sidebar-count">03</span>
+                <span class="sidebar-count">{{ sidebar_project_count|stringformat:"02d" }}</span>
             </a>
+            {% endwith %}
             <a class="sidebar-link" href="#">
                 <span class="sidebar-icon icon-task" aria-hidden="true">☷</span>
                 <span>업무 관리</span>

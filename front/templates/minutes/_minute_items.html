@@ -1,0 +1,30 @@
+{# 회의록 목록 영역. minute_list.html 에서 include, JS 검색 시 이 부분만 다시 받아온다. #}
+{% if minutes_list %}
+    <div class="item-list">
+        {% for minutes in minutes_list %}
+            <a class="item-row" href="{% url 'minutes_detail' project.id minutes.id %}">
+                <span class="item-icon is-minutes" aria-hidden="true">☷</span>
+                <div class="item-body">
+                    <h3 class="item-title">{{ minutes.title }}</h3>
+                    <p class="item-desc">{{ minutes.content|truncatechars:120 }}</p>
+                </div>
+                <div class="item-meta">
+                    {% if minutes.audio_count %}<span class="badge badge-brand">음성 첨부</span>{% endif %}
+                    <span>{{ minutes.created_by.name|default:minutes.created_by.username|default:"-" }}</span>
+                    <span>{{ minutes.created_at|date:"Y.m.d H:i" }}</span>
+                </div>
+            </a>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="empty-state mt-4">
+        {% if q %}
+            <h3>'{{ q }}'에 해당하는 회의록이 없습니다</h3>
+            <p>다른 검색어로 다시 찾아보세요.</p>
+        {% else %}
+            <h3>아직 회의록이 없습니다</h3>
+            <p>이 프로젝트의 첫 회의록을 만들어 보세요.</p>
+            <a class="btn btn-primary mt-2" href="{% url 'minutes_create' project.id %}">새 회의록 생성</a>
+        {% endif %}
+    </div>
+{% endif %}

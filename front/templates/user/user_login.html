@@ -19,7 +19,7 @@
 <body class="auth-page">
     <main class="auth-wrap">
         <section class="auth-card login-card" aria-labelledby="login-title">
-            <a class="auth-logo" href="/" aria-label="MODI 메인으로 이동">
+            <a class="auth-logo" href="{{ home_url }}" aria-label="MODI 메인으로 이동">
                 <img src="{% static 'images/modi-icon.svg' %}" alt="">
             </a>
 
@@ -57,7 +57,7 @@
 
             <p class="auth-footer">
                 <span>아직 회원이 아니신가요?</span>
-                <a href="/user/signup/">회원가입</a>
+                <a href="{% url 'user_signup' %}">회원가입</a>
             </p>
         </section>
         <p class="auth-copyright">© MODI</p>

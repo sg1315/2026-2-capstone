@@ -1,0 +1,78 @@
+{% extends 'layouts/workspace.html' %}
+
+{% block title %}{{ minutes.title }}{% endblock %}
+
+{% block content %}
+
+    <nav class="breadcrumb" aria-label="현재 위치">
+        <a href="{% url 'project_list' %}">프로젝트</a>
+        <span aria-hidden="true">›</span>
+        <a href="{% url 'project_detail' project.id %}">{{ project.title }}</a>
+        <span aria-hidden="true">›</span>
+        <span aria-current="page">{{ minutes.title }}</span>
+    </nav>
+
+    <article class="card">
+        <header class="page-header mb-0">
+            <div>
+                <span class="eyebrow">MINUTES</span>
+                <h1 class="page-title">{{ minutes.title }}</h1>
+            </div>
+            <div class="cluster">
+                <a class="btn btn-secondary" href="{% url 'project_detail' project.id %}">목록으로</a>
+                {% if can_edit %}
+                    {# 회의록 작성자나 프로젝트 생성자에게만 표시 (서버에서도 다시 확인) #}
+                    <a class="btn btn-secondary" href="{% url 'minutes_update' project.id minutes.id %}">수정</a>
+                    <form method="POST" action="{% url 'minutes_delete_action' project.id minutes.id %}"
+                          data-confirm-action="'{{ minutes.title }}' 회의록을 삭제할까요?&#10;첨부된 음성파일도 더 이상 볼 수 없게 됩니다.">
+                        {% csrf_token %}
+                        <button class="btn btn-danger" type="submit">삭제</button>
+                    </form>
+                {% endif %}
+            </div>
+        </header>
+
+        <dl class="meta-list">
+            <div>
+                <dt>프로젝트</dt>
+                <dd>{{ project.title }}</dd>
+            </div>
+            <div>
+                <dt>작성자</dt>
+                <dd>{{ minutes.created_by.name|default:minutes.created_by.username|default:"-" }}</dd>
+            </div>
+            <div>
+                <dt>작성일</dt>
+                <dd>{{ minutes.created_at|date:"Y.m.d H:i" }}</dd>
+            </div>
+            {% if minutes.updated_at|date:"YmdHi" != minutes.created_at|date:"YmdHi" %}
+                <div>
+                    <dt>수정일</dt>
+                    <dd>{{ minutes.updated_at|date:"Y.m.d H:i" }}</dd>
+                </div>
+            {% endif %}
+        </dl>
+
+        {% if audio_files %}
+            <section class="mt-4">
+                <h2 class="form-label">회의 음성</h2>
+                {% for file in audio_files %}
+                    {% url 'minutes_file' project.id minutes.id file.id as file_url %}
+                    <div class="audio-item">
+                        <audio controls preload="metadata" src="{{ file_url }}"></audio>
+                        <div class="audio-info">
+                            <span class="audio-name">{{ file.name }}</span>
+                            <span class="text-muted">{{ file.size|filesizeformat }}</span>
+                            <a class="btn btn-secondary btn-sm" href="{{ file_url }}?download=1">다운로드</a>
+                        </div>
+                    </div>
+                {% endfor %}
+            </section>
+        {% endif %}
+
+        <hr class="divider mt-4 mb-4">
+
+        <div class="prose">{{ minutes.content }}</div>
+    </article>
+
+{% endblock %}

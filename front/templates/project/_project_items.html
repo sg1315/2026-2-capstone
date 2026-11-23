@@ -1,0 +1,43 @@
+{# 프로젝트 목록 영역. project_list.html 에서 include, JS 검색/탭 전환 시 이 부분만 다시 받아온다. #}
+{% if projects %}
+    <div class="item-list">
+        {% for project in projects %}
+            <a class="item-row" href="{% url 'project_detail' project.id %}">
+                <span class="item-icon" aria-hidden="true">▦</span>
+                <div class="item-body">
+                    <h3 class="item-title">{{ project.title }}</h3>
+                    <p class="item-desc">{{ project.content|default:"설명이 없는 프로젝트입니다." }}</p>
+                    {% if project.active_hashtags %}
+                        <div class="tag-list">
+                            {% for tag in project.active_hashtags %}<span class="badge badge-brand">#{{ tag.name }}</span>{% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="item-meta">
+                    <span>
+                        {% if project.start_at or project.end_at %}
+                            {{ project.start_at|date:"Y.m.d"|default:"미정" }} ~ {{ project.end_at|date:"Y.m.d"|default:"미정" }}
+                        {% else %}
+                            기간 미정
+                        {% endif %}
+                    </span>
+                    <span class="badge badge-neutral">회의록 {{ project.minutes_count }}</span>
+                </div>
+            </a>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="empty-state mt-4">
+        {% if q %}
+            <h3>'{{ q }}'에 해당하는 프로젝트가 없습니다</h3>
+            <p>다른 검색어로 다시 찾아보세요.</p>
+        {% elif tab == 'shared' %}
+            <h3>공유 받은 프로젝트가 없습니다</h3>
+            <p>다른 사람이 프로젝트에 초대하면 여기에 표시됩니다.</p>
+        {% else %}
+            <h3>아직 만든 프로젝트가 없습니다</h3>
+            <p>첫 프로젝트를 만들고 회의록을 정리해 보세요.</p>
+            <a class="btn btn-primary mt-2" href="{% url 'project_create' %}">새 프로젝트 생성</a>
+        {% endif %}
+    </div>
+{% endif %}

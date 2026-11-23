@@ -1,0 +1,40 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#24364B">
+    <title>{% block title %}Modi{% endblock %} | Modi</title>
+    <link rel="icon" type="image/svg+xml" href="{% static 'images/modi-icon.svg' %}">
+    <link rel="stylesheet" href="{% static 'css/app.css' %}">
+    <link rel="stylesheet" href="{% static 'css/common.css' %}">
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="workspace-page">
+
+    <!-- 로그인 후 작업 화면 공통 레이아웃: header + sidebar + 콘텐츠 -->
+    {% include 'includes/header.html' %}
+
+    <div class="site-layout">
+        {% include 'includes/sidebar.html' %}
+
+        <main class="workspace-content">
+            <div class="workspace-inner">
+
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-{{ message.tags }}{% endif %} mb-4" role="status">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+
+                {% block content %}{% endblock %}
+
+            </div>
+        </main>
+    </div>
+
+    <script src="{% static 'js/common.js' %}"></script>
+    {% block script %}{% endblock %}
+</body>
+</html>

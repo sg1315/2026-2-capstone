@@ -61,6 +61,8 @@ class ProjectFile(models.Model):
         ('1', '음성파일'),
     ]
 
+    project = models.ForeignKey(Project, on_delete=models.PROTECT, db_constraint=False, db_column='project_id',
+                                verbose_name='프로젝트')
     path = models.FileField('파일 경로', upload_to=project_upload_to, max_length=1000, blank=True, null=True)
     name = models.CharField('파일명', max_length=512, blank=True, null=True)
     type = models.CharField('파일 형식', max_length=128, blank=True, null=True)
@@ -96,4 +98,27 @@ class ProjectFile(models.Model):
     class Meta:
         db_table = 'project_file'
         verbose_name = '프로젝트 첨부파일'
+        verbose_name_plural = verbose_name
+
+
+class ProjectHashtag(models.Model):
+    """프로젝트 해시태그 (프로젝트당 최대 3개, '#' 없이 저장). 목록 요약 표시와 검색에 사용."""
+    project = models.ForeignKey(Project, on_delete=models.PROTECT, db_constraint=False, db_column='project_id',
+                                related_name='hashtags', verbose_name='프로젝트')
+    name = models.CharField('해시태그', max_length=20, blank=False, null=False)
+
+    created_at = models.DateTimeField('생성일시', auto_now_add=True)
+    updated_at = models.DateTimeField('수정일시', auto_now=True)
+    created_by = models.ForeignKey(User, on_delete=models.RESTRICT, db_constraint=False, blank=True, null=True,
+                                   related_name='+', verbose_name='생성자')
+    updated_by = models.ForeignKey(User, on_delete=models.RESTRICT, db_constraint=False, blank=True, null=True,
+                                   related_name='+', verbose_name='수정자')
+    use_flag = models.CharField('사용 여부', max_length=1, blank=True, default='Y', choices=[('N', 'N'), ('Y', 'Y'), ])
+
+    def __str__(self):
+        return f'#{self.name}'
+
+    class Meta:
+        db_table = 'project_hashtag'
+        verbose_name = '프로젝트 해시태그'
         verbose_name_plural = verbose_name
