@@ -62,7 +62,7 @@ class ProjectFile(models.Model):
     ]
 
     project = models.ForeignKey(Project, on_delete=models.PROTECT, db_constraint=False, db_column='project_id',
-                                verbose_name='프로젝트')
+                                blank=True, null=True, verbose_name='프로젝트')
     path = models.FileField('파일 경로', upload_to=project_upload_to, max_length=1000, blank=True, null=True)
     name = models.CharField('파일명', max_length=512, blank=True, null=True)
     type = models.CharField('파일 형식', max_length=128, blank=True, null=True)
