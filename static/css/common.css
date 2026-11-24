@@ -921,6 +921,22 @@ a.badge:hover { color: var(--color-white); background: var(--modi-ink); border-c
     white-space: nowrap;
 }
 a.file-name:hover { color: var(--modi-blue-strong); text-decoration: underline; }
+/* 선택한 첨부파일 빼기 (project_form.html) */
+.file-remove {
+    display: grid;
+    flex: none;
+    width: 22px;
+    height: 22px;
+    padding: 0;
+    place-items: center;
+    border: 0;
+    border-radius: 50%;
+    color: var(--color-text-muted);
+    background: transparent;
+    font-size: 11px;
+    cursor: pointer;
+}
+.file-remove:hover { color: var(--color-white); background: var(--color-danger); }
 
 /* 사용자 검색 후 추가 (프로젝트 참여자) - common.js initUserPicker */
 .user-picker { position: relative; }

@@ -248,10 +248,26 @@
         box.addEventListener('change', showFileCountError);
     });
 
-    // 선택한 파일 목록 미리보기 + 즉시 검사
-    fileInput.addEventListener('change', () => {
-        const files = Array.from(fileInput.files);
-        filePreview.replaceChildren(...files.map((file) => {
+    /*
+     * 선택한 파일 목록. input.files 는 직접 고칠 수 없어서 이 배열을 기준으로
+     * DataTransfer 로 다시 채운다 (전송 시 new FormData(form) 가 input.files 를 그대로 읽음).
+     * 파일을 다시 고르면 기존 선택에 추가되고, 같은 파일(이름·크기·수정시각)은 한 번만 들어간다.
+     */
+    let selectedFiles = [];
+
+    function fileKey(file) {
+        return file.name + '|' + file.size + '|' + file.lastModified;
+    }
+
+    function syncFileInput() {
+        const dt = new DataTransfer();
+        selectedFiles.forEach((file) => dt.items.add(file));
+        fileInput.files = dt.files;
+    }
+
+    // 선택한 파일 목록 미리보기 (행마다 X 버튼) + 즉시 검사
+    function renderFilePreview() {
+        filePreview.replaceChildren(...selectedFiles.map((file, index) => {
             const li = document.createElement('li');
             const name = document.createElement('span');
             name.className = 'file-name';
@@ -259,12 +275,38 @@
             const size = document.createElement('span');
             size.className = 'text-muted';
             size.textContent = formatSize(file.size);
-            li.append(name, size);
+            const remove = document.createElement('button');
+            remove.type = 'button';
+            remove.className = 'file-remove';
+            remove.dataset.index = index;
+            remove.setAttribute('aria-label', file.name + ' 첨부 취소');
+            remove.textContent = '✕';
+            li.append(name, size, remove);
             if (validateFile(file)) li.classList.add('is-invalid');
             return li;
         }));
-        filePreview.hidden = files.length === 0;
+        filePreview.hidden = selectedFiles.length === 0;
         showFileCountError();
+    }
+
+    fileInput.addEventListener('change', () => {
+        const keys = new Set(selectedFiles.map(fileKey));
+        Array.from(fileInput.files).forEach((file) => {
+            if (!keys.has(fileKey(file))) {
+                keys.add(fileKey(file));
+                selectedFiles.push(file);
+            }
+        });
+        syncFileInput();
+        renderFilePreview();
+    });
+
+    filePreview.addEventListener('click', (e) => {
+        const button = e.target.closest('.file-remove');
+        if (!button) return;
+        selectedFiles.splice(Number(button.dataset.index), 1);
+        syncFileInput();
+        renderFilePreview();
     });
 
     /* ---------- 전송 ---------- */
