@@ -1,0 +1,210 @@
+{% extends 'layouts/workspace.html' %}
+
+{# 업무 배정: 회의록 분석으로 만들어진 업무를 프로젝트 참여자에게 배정 (저장: minutes_tasks_save_action) #}
+
+{% block title %}업무 배정 · {{ minutes.title }}{% endblock %}
+
+{% block content %}
+
+    <nav class="breadcrumb" aria-label="현재 위치">
+        <a href="{% url 'project_list' %}">프로젝트</a>
+        <span aria-hidden="true">›</span>
+        <a href="{% url 'project_detail' project.id %}">{{ project.title }}</a>
+        <span aria-hidden="true">›</span>
+        <a href="{% url 'minutes_detail' project.id minutes.id %}">{{ minutes.title }}</a>
+        <span aria-hidden="true">›</span>
+        <span aria-current="page">업무 배정</span>
+    </nav>
+
+    <header class="page-header">
+        <div>
+            <span class="eyebrow">ASSIGN TASKS</span>
+            <h1 class="page-title">업무 배정</h1>
+            <p class="page-description">'{{ minutes.title }}' 회의에서 나온 업무를 프로젝트 참여자에게 배정합니다. 업무 내용과 마감일도 고칠 수 있습니다.</p>
+        </div>
+    </header>
+
+    {# 여러 업무를 한 번에 편집하는 목록 화면이라 .form-card(최대 720px) 대신 .card 로 작업 영역 너비를 모두 쓴다 #}
+    <form class="card" id="taskForm" action="{{ action_url }}" novalidate>
+        {% csrf_token %}
+        <div class="stack">
+            <div class="alert alert-danger" role="alert" data-form-alert hidden></div>
+
+            {% if not members %}
+                <div class="alert alert-warning"><p>프로젝트 참여자가 없습니다. 프로젝트 수정에서 참여자를 먼저 추가해 주세요.</p></div>
+            {% endif %}
+
+            {# 업무 1건 = .panel 하나. 내용은 한 줄 전체, 담당자/마감일은 .grid-2 로 나란히 #}
+            <div class="stack" id="taskRows">
+                {% for task in tasks %}
+                    <div class="panel stack" data-task-row data-task-id="{{ task.id }}">
+                        <div class="section-header mb-0">
+                            <div class="cluster">
+                                <span class="form-label mb-0" data-task-no>업무 {{ forloop.counter }}</span>
+                                <span class="badge badge-danger" data-deleted-badge hidden>삭제 예정</span>
+                            </div>
+                            <button type="button" class="btn btn-ghost btn-sm" data-row-delete>삭제</button>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="task-content-{{ task.id }}">업무 내용 <span class="required-mark">*</span></label>
+                            <textarea class="textarea" id="task-content-{{ task.id }}" rows="2" maxlength="{{ content_max_length }}" data-field="content">{{ task.content }}</textarea>
+                        </div>
+                        <div class="grid grid-2">
+                            <div class="form-group">
+                                <label class="form-label" for="task-user-{{ task.id }}">담당자</label>
+                                <select class="select" id="task-user-{{ task.id }}" data-field="user_id">
+                                    <option value="">미지정</option>
+                                    {% for member in members %}
+                                        <option value="{{ member.id }}" {% if member.id == task.user_id %}selected{% endif %}>{{ member.name|default:member.username }}{% if member.name %} (@{{ member.username }}){% endif %}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="task-due-{{ task.id }}">마감일</label>
+                                <input class="input" type="date" id="task-due-{{ task.id }}" data-field="due_date" value="{{ task.due_at|date:'Y-m-d' }}">
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            <p class="text-muted" id="taskEmpty" {% if tasks %}hidden{% endif %}>업무가 없습니다. 아래에서 직접 추가할 수 있습니다.</p>
+
+            <div>
+                <button type="button" class="btn btn-secondary" id="addTask">+ 업무 추가</button>
+            </div>
+
+            {# 새 업무 템플릿 (JS 가 복사해서 씀, id 는 복사할 때 붙인다) #}
+            <template id="taskRowTemplate">
+                <div class="panel stack" data-task-row>
+                    <div class="section-header mb-0">
+                        <div class="cluster">
+                            <span class="form-label mb-0" data-task-no>업무</span>
+                            <span class="badge badge-brand">새 업무</span>
+                        </div>
+                        <button type="button" class="btn btn-ghost btn-sm" data-row-delete>삭제</button>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" data-for="content">업무 내용 <span class="required-mark">*</span></label>
+                        <textarea class="textarea" rows="2" maxlength="{{ content_max_length }}" data-field="content" placeholder="예: 로그인 API 에 토큰 만료 처리 추가"></textarea>
+                    </div>
+                    <div class="grid grid-2">
+                        <div class="form-group">
+                            <label class="form-label" data-for="user_id">담당자</label>
+                            <select class="select" data-field="user_id">
+                                <option value="">미지정</option>
+                                {% for member in members %}
+                                    <option value="{{ member.id }}">{{ member.name|default:member.username }}{% if member.name %} (@{{ member.username }}){% endif %}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" data-for="due_date">마감일</label>
+                            <input class="input" type="date" data-field="due_date">
+                        </div>
+                    </div>
+                </div>
+            </template>
+
+            <hr class="divider">
+
+            <div class="cluster justify-end">
+                <a class="btn btn-secondary" href="{{ cancel_url }}">취소</a>
+                <button class="btn btn-primary" type="submit">배정 저장</button>
+            </div>
+        </div>
+    </form>
+
+{% endblock %}
+
+{% block script %}
+<script>
+    const taskForm = document.getElementById('taskForm');
+    const taskRows = document.getElementById('taskRows');
+    const taskEmpty = document.getElementById('taskEmpty');
+    const rowTemplate = document.getElementById('taskRowTemplate');
+    let newRowSeq = 0;
+
+    function allRows() {
+        return Array.from(taskRows.querySelectorAll('[data-task-row]'));
+    }
+
+    // 삭제 예정이 아닌 업무에 1, 2, 3... 번호를 다시 매긴다
+    function renumber() {
+        let no = 0;
+        allRows().forEach((row) => {
+            const deleted = row.dataset.deleted === 'true';
+            if (!deleted) no += 1;
+            row.querySelector('[data-task-no]').textContent = deleted ? '업무' : '업무 ' + no;
+        });
+        taskEmpty.hidden = no > 0;
+    }
+
+    document.getElementById('addTask').addEventListener('click', () => {
+        const row = rowTemplate.content.firstElementChild.cloneNode(true);
+        newRowSeq += 1;
+        row.querySelectorAll('[data-field]').forEach((field) => {
+            field.id = 'new-task-' + field.dataset.field + '-' + newRowSeq;
+            row.querySelector('[data-for="' + field.dataset.field + '"]').htmlFor = field.id;
+        });
+        taskRows.appendChild(row);
+        renumber();
+        row.querySelector('[data-field="content"]').focus();
+    });
+
+    // 기존 업무: '삭제' 를 누르면 '삭제 예정' 으로 표시하고(되돌리기 가능) 저장할 때 삭제. 새로 추가한 업무는 바로 지운다.
+    taskRows.addEventListener('click', (e) => {
+        const button = e.target.closest('[data-row-delete]');
+        if (!button) return;
+        const row = button.closest('[data-task-row]');
+        if (!row.dataset.taskId) {
+            row.remove();
+        } else {
+            const deleted = row.dataset.deleted !== 'true';
+            row.dataset.deleted = String(deleted);
+            row.querySelector('[data-deleted-badge]').hidden = !deleted;
+            button.textContent = deleted ? '되돌리기' : '삭제';
+            row.querySelectorAll('[data-field]').forEach((field) => { field.disabled = deleted; });
+        }
+        renumber();
+    });
+
+    function collectTasks() {
+        return allRows().map((row) => ({
+            id: row.dataset.taskId ? Number(row.dataset.taskId) : null,
+            content: row.querySelector('[data-field="content"]').value.trim(),
+            user_id: Number(row.querySelector('[data-field="user_id"]').value) || null,
+            due_date: row.querySelector('[data-field="due_date"]').value,
+            deleted: row.dataset.deleted === 'true',
+        }));
+    }
+
+    function validateTaskForm() {
+        const rows = allRows();
+        const tasks = collectTasks();
+        for (let i = 0; i < tasks.length; i += 1) {
+            if (!tasks[i].deleted && !tasks[i].content) {
+                const field = rows[i].querySelector('[data-field="content"]');
+                showFormAlert(taskForm, rows[i].querySelector('[data-task-no]').textContent + '의 내용을 입력해 주세요.');
+                field.focus();
+                return { _form: 'invalid' };  // submitForm 이 전송을 멈추도록 (표시할 필드는 없음)
+            }
+        }
+        return {};
+    }
+
+    taskForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        submitForm(taskForm, {
+            url: taskForm.action,
+            validate: validateTaskForm,
+            busyText: '저장 중...',
+            buildData: (form) => {
+                const data = new FormData();
+                data.append('csrfmiddlewaretoken', form.elements.csrfmiddlewaretoken.value);
+                data.append('tasks', JSON.stringify(collectTasks()));
+                return data;
+            },
+        });
+    });
+</script>
+{% endblock %}

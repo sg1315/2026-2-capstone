@@ -3,6 +3,7 @@ from django.urls import path
 from .views import main_views
 from .views import minutes_views
 from .views import project_views
+from .views import task_views
 from .views import user_views
 
 
@@ -19,6 +20,10 @@ urlpatterns = [
     path('user/signup/', user_views.user_signup, name='user_signup'),
     path('user/signupAction/', user_views.user_signup_action, name='user_signup_action'),
     path('user/search/', user_views.user_search, name='user_search'),
+
+    # 업무 관리 (내 업무)
+    path('tasks/', task_views.task_list, name='task_list'),
+    path('tasks/<int:task_id>/completeAction/', task_views.task_complete_action, name='task_complete_action'),
 
     # 프로젝트
     path('project/', project_views.project_list, name='project_list'),
@@ -37,6 +42,9 @@ urlpatterns = [
     path('project/<int:project_id>/minutes/<int:minutes_id>/update/', minutes_views.minutes_update, name='minutes_update'),
     path('project/<int:project_id>/minutes/<int:minutes_id>/updateAction/', minutes_views.minutes_update_action, name='minutes_update_action'),
     path('project/<int:project_id>/minutes/<int:minutes_id>/deleteAction/', minutes_views.minutes_delete_action, name='minutes_delete_action'),
+    path('project/<int:project_id>/minutes/<int:minutes_id>/analyzeAction/', minutes_views.minutes_analyze_action, name='minutes_analyze_action'),
+    path('project/<int:project_id>/minutes/<int:minutes_id>/tasks/', minutes_views.minutes_tasks, name='minutes_tasks'),
+    path('project/<int:project_id>/minutes/<int:minutes_id>/tasks/saveAction/', minutes_views.minutes_tasks_save_action, name='minutes_tasks_save_action'),
     path('project/<int:project_id>/minutes/<int:minutes_id>/files/<int:file_id>/', minutes_views.minutes_file, name='minutes_file'),
 
 

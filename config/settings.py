@@ -153,6 +153,17 @@ MAILERS = {
     },
 }
 
+# AI 회의록 분석 (base/ai). 키는 환경변수나 local_settings.py 에만 두고 저장소에 올리지 않는다.
+# Claude: https://console.anthropic.com 에서 발급한 API 키
+ANTHROPIC_API_KEY = os.environ.get('ANTHROPIC_API_KEY', '')
+# 키가 특정 워크스페이스에 묶여 있지 않으면 필수 (Console > Settings > Workspaces 의 ID, 'wrkspc_...')
+ANTHROPIC_WORKSPACE_ID = os.environ.get('ANTHROPIC_WORKSPACE_ID', '')
+# 지금은 가장 저렴한 Haiku. 업그레이드할 때 이 값만 바꾸면 된다 (예: 'claude-sonnet-5-5')
+CLAUDE_MINUTES_MODEL = os.environ.get('CLAUDE_MINUTES_MODEL', 'claude-haiku-5-5')
+# Naver CLOVA Speech: 콘솔 > 빌더 > 설정 > 연동 정보의 Invoke URL 과 Secret Key
+CLOVA_SPEECH_INVOKE_URL = os.environ.get('CLOVA_SPEECH_INVOKE_URL', '')
+CLOVA_SPEECH_SECRET_KEY = os.environ.get('CLOVA_SPEECH_SECRET_KEY', '')
+
 try:
     from .local_settings import *
 except ImportError:

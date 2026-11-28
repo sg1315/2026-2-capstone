@@ -15,6 +15,8 @@ class Task(models.Model):
         User,
         on_delete=models.PROTECT,
         db_constraint=False,
+        blank=True,
+        null=True,  # AI 가 담당자를 특정하지 못한 업무는 미지정
         verbose_name='담당자'
     )
     content = models.TextField('업무 내용', blank=True, null=True)

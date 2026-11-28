@@ -10,6 +10,13 @@ MB = 1024 * 1024
 AUDIO_EXTENSIONS = {'.mp3', '.m4a', '.wav', '.webm', '.ogg', '.aac', '.flac'}
 AUDIO_MAX_SIZE = 200 * MB
 
+# 회의 자료 (회의에 사용한 문서). AI 가 읽을 수 있는 형식은 base/ai/documents.py 참고
+DOCUMENT_EXTENSIONS = {
+    '.pdf', '.doc', '.docx', '.xls', '.xlsx', '.ppt', '.pptx', '.hwp', '.hwpx', '.txt', '.md', '.csv',
+}
+MINUTES_DOC_MAX_SIZE = 50 * MB
+MINUTES_DOC_MAX_COUNT = 5
+
 # 프로젝트 첨부파일 (문서/이미지/압축 + 음성)
 PROJECT_FILE_EXTENSIONS = {
     '.pdf', '.doc', '.docx', '.xls', '.xlsx', '.ppt', '.pptx', '.hwp', '.hwpx',

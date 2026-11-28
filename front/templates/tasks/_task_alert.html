@@ -1,0 +1,13 @@
+{# 마감 임박 알림. task_list.html 에서 include, 업무 완료 체크 후 task_complete_action 응답으로 다시 그린다. #}
+{% if stats.urgent %}
+    <div class="alert {% if stats.overdue or stats.due_today %}alert-danger{% else %}alert-warning{% endif %} mb-4" role="status">
+        <div class="section-header mb-0">
+            <p class="mb-0"><strong>마감 임박 · 내 담당 업무 {{ stats.urgent }}건을 확인해 주세요.</strong></p>
+            <div class="cluster">
+                {% if stats.overdue %}<span class="badge badge-danger">지연 {{ stats.overdue }}건</span>{% endif %}
+                {% if stats.due_today %}<span class="badge badge-danger">오늘 마감 {{ stats.due_today }}건</span>{% endif %}
+                {% if stats.due_soon %}<span class="badge badge-warning">{{ stats.urgent_days }}일 이내 {{ stats.due_soon }}건</span>{% endif %}
+            </div>
+        </div>
+    </div>
+{% endif %}

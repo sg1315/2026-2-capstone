@@ -70,9 +70,139 @@
             </section>
         {% endif %}
 
-        <hr class="divider mt-4 mb-4">
+        {% if document_files %}
+            <section class="mt-4">
+                <h2 class="form-label">회의 자료</h2>
+                <ul class="file-list">
+                    {% for file in document_files %}
+                        {% url 'minutes_file' project.id minutes.id file.id as file_url %}
+                        <li>
+                            <span class="file-icon" aria-hidden="true">▤</span>
+                            <a class="file-name" href="{{ file_url }}?download=1">{{ file.name }}</a>
+                            <span class="text-muted">{{ file.size|filesizeformat }}</span>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </section>
+        {% endif %}
 
-        <div class="prose">{{ minutes.content }}</div>
+        {% if minutes.content %}
+            <hr class="divider mt-4 mb-4">
+            <h2 class="form-label">회의 내용</h2>
+            <div class="prose">{{ minutes.content }}</div>
+        {% endif %}
     </article>
 
+    {% if has_audio or minutes.ai_status != 'N' %}
+        {# AI 분석: 음성파일 -> CLOVA Speech 텍스트 변환 -> Claude 회의 정리 + 업무 추출 (base/ai/pipeline.py) #}
+        <section class="card mt-4" id="aiAnalysis" {% if ai_running %}data-ai-running{% endif %}>
+            <header class="page-header mb-0">
+                <div>
+                    <span class="eyebrow">AI SUMMARY</span>
+                    <h2 class="page-title">AI 회의 정리</h2>
+                </div>
+                <div class="cluster">
+                    {% if minutes.ai_status == 'W' %}<span class="badge badge-neutral">분석 대기</span>
+                    {% elif minutes.ai_status == 'R' %}<span class="badge badge-info">분석 중</span>
+                    {% elif minutes.ai_status == 'D' %}<span class="badge badge-success">분석 완료</span>
+                    {% elif minutes.ai_status == 'F' %}<span class="badge badge-danger">분석 실패</span>
+                    {% endif %}
+                    {% if can_edit and has_audio and not ai_running %}
+                        <form method="POST" action="{% url 'minutes_analyze_action' project.id minutes.id %}"
+                              data-confirm-action="음성파일을 다시 분석할까요?&#10;AI 가 만든 기존 업무 목록은 새 결과로 바뀝니다.">
+                            {% csrf_token %}
+                            <button class="btn btn-secondary btn-sm" type="submit">{% if minutes.ai_status == 'N' %}분석 시작{% else %}다시 분석{% endif %}</button>
+                        </form>
+                    {% endif %}
+                </div>
+            </header>
+
+            {% if ai_running %}
+                <p class="text-muted mt-4">음성을 텍스트로 바꾸고 회의 내용을 정리하고 있습니다. 녹음 길이에 따라 몇 분 걸릴 수 있으며, 끝나면 자동으로 새로고침됩니다.</p>
+            {% elif minutes.ai_status == 'F' %}
+                <div class="alert alert-danger mt-4"><p>{{ minutes.ai_message|default:'분석에 실패했습니다.' }}</p></div>
+            {% elif minutes.ai_status == 'D' and minutes.ai_message %}
+                {# 완료했지만 읽지 못한 참고 문서가 있을 때 (doc/ppt/xls/hwp 구형식 등) #}
+                <div class="alert alert-warning mt-4"><p>{{ minutes.ai_message }} · docx/pptx/xlsx/pdf 형식으로 다시 올리면 분석에 반영됩니다.</p></div>
+            {% endif %}
+
+            {% if minutes.summary %}
+                <div class="prose mt-4">{{ minutes.summary }}</div>
+            {% endif %}
+
+            {% if minutes.ai_status == 'D' or tasks %}
+                <div class="section-header mt-4 mb-0">
+                    <h3 class="form-label mb-0">업무 목록</h3>
+                    {% if can_edit and not ai_running %}
+                        <a class="btn btn-primary btn-sm" href="{% url 'minutes_tasks' project.id minutes.id %}">업무 배정하기</a>
+                    {% endif %}
+                </div>
+                {% if unassigned_count and can_edit and not ai_running %}
+                    <div class="alert alert-info mt-2"><p>담당자가 정해지지 않은 업무가 {{ unassigned_count }}건 있습니다. '업무 배정하기'에서 프로젝트 참여자에게 배정해 주세요.</p></div>
+                {% endif %}
+                {% if tasks %}
+                    <div class="table-wrap">
+                        <table class="table">
+                            <thead>
+                                <tr><th>업무</th><th>담당자</th><th>마감일</th></tr>
+                            </thead>
+                            <tbody>
+                                {% for task in tasks %}
+                                    <tr>
+                                        <td>{{ task.content }}</td>
+                                        <td>{% if task.user %}{{ task.user.name|default:task.user.username }}{% else %}<span class="text-muted">미지정</span>{% endif %}</td>
+                                        <td>{{ task.due_at|date:"Y.m.d"|default:"-" }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="text-muted">회의에서 정해진 업무가 없습니다.</p>
+                {% endif %}
+            {% endif %}
+
+            {% if minutes.transcript %}
+                {# 음성 변환 원문: 기본은 접힘. 제목 옆 버튼과 원문 아래 '접기' 버튼으로 펼치고 접는다 #}
+                <hr class="divider mt-4">
+                <div class="section-header mt-4 mb-0" id="transcriptHeader">
+                    <h3 class="form-label mb-0">음성 변환 원문</h3>
+                    <button type="button" class="btn btn-secondary btn-sm" data-toggle-transcript
+                            aria-controls="transcriptBody" aria-expanded="false">펼치기 ▼</button>
+                </div>
+                <div id="transcriptBody" hidden>
+                    <div class="prose mt-2">{{ minutes.transcript }}</div>
+                    <div class="text-right mt-2">
+                        <button type="button" class="btn btn-secondary btn-sm" data-toggle-transcript
+                                aria-controls="transcriptBody">접기 ▲</button>
+                    </div>
+                </div>
+            {% endif %}
+        </section>
+    {% endif %}
+
+{% endblock %}
+
+{% block script %}
+<script>
+    // 분석 중이면 10초마다 새로고침해서 결과를 보여준다
+    if (document.querySelector('[data-ai-running]')) {
+        setTimeout(() => window.location.reload(), 10000);
+    }
+
+    // 음성 변환 원문 펼치기/접기. 아래쪽 '접기' 로 접으면 제목 위치로 돌아간다
+    const transcriptBody = document.getElementById('transcriptBody');
+    if (transcriptBody) {
+        const headerToggle = document.querySelector('#transcriptHeader [data-toggle-transcript]');
+        document.querySelectorAll('[data-toggle-transcript]').forEach((button) => {
+            button.addEventListener('click', () => {
+                const open = transcriptBody.hidden;
+                transcriptBody.hidden = !open;
+                headerToggle.textContent = open ? '접기 ▲' : '펼치기 ▼';
+                headerToggle.setAttribute('aria-expanded', String(open));
+                if (!open) document.getElementById('transcriptHeader').scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+            });
+        });
+    }
+</script>
 {% endblock %}
