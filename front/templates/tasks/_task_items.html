@@ -1,0 +1,49 @@
+{# 내 업무 목록 영역. task_list.html 에서 include, JS 검색/탭 전환/완료 체크 시 이 부분만 다시 받아온다. #}
+{% if tasks %}
+    <div class="item-list">
+        {% for task in tasks %}
+            {% with minutes=task.minutes project=task.minutes.project %}
+                <div class="item-row" data-task-row>
+                    <label class="form-check" title="{% if task.complete_flag == 'Y' %}완료 취소{% else %}완료로 표시{% endif %}">
+                        <input type="checkbox" data-task-complete="{% url 'task_complete_action' task.id %}"
+                               {% if task.complete_flag == 'Y' %}checked{% endif %}
+                               aria-label="'{{ task.content|truncatechars:40 }}' {% if task.complete_flag == 'Y' %}완료 취소{% else %}완료{% endif %}">
+                    </label>
+                    <div class="item-body">
+                        <a href="{% url 'minutes_detail' project.id minutes.id %}" title="{{ task.content }}">
+                            <h3 class="item-title{% if task.complete_flag == 'Y' %} text-muted{% endif %}">{{ task.content }}</h3>
+                        </a>
+                        <p class="item-desc">
+                            <a href="{% url 'project_detail' project.id %}">{{ project.title }}</a>
+                            · <a href="{% url 'minutes_detail' project.id minutes.id %}">{{ minutes.title }}</a>
+                            · {{ minutes.created_at|date:"Y.m.d" }} 회의
+                        </p>
+                        {% if project.active_hashtags %}
+                            <div class="tag-list">
+                                {% for tag in project.active_hashtags %}<span class="badge badge-brand">#{{ tag.name }}</span>{% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="item-meta">
+                        <span>{% if task.due_date %}마감일 {{ task.due_date|date:"Y.m.d" }}{% else %}마감일 없음{% endif %}</span>
+                        <span class="badge {{ task.due_badge }}">{{ task.due_label }}</span>
+                    </div>
+                </div>
+            {% endwith %}
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="empty-state mt-4">
+        {% if q %}
+            <h3>'{{ q }}'에 해당하는 업무가 없습니다</h3>
+            <p>업무 내용, 프로젝트명, 회의록명이나 #해시태그로 다시 찾아보세요.</p>
+        {% elif tab == 'done' %}
+            <h3>완료한 업무가 없습니다</h3>
+            <p>진행 중인 업무를 체크하면 여기로 옮겨집니다.</p>
+        {% else %}
+            <h3>진행 중인 업무가 없습니다</h3>
+            <p>회의록에서 업무가 배정되면 여기에 표시됩니다.</p>
+            <a class="btn btn-primary mt-2" href="{% url 'project_list' %}">프로젝트 보기</a>
+        {% endif %}
+    </div>
+{% endif %}

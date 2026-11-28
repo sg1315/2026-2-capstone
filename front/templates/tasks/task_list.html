@@ -1,0 +1,109 @@
+{% extends 'layouts/workspace.html' %}
+
+{# 업무 관리: 로그인한 사용자에게 배정된 업무 (회의록 분석 -> 업무 배정으로 만들어진 Task) #}
+
+{% block title %}업무 관리{% endblock %}
+
+{% block content %}
+
+    <header class="page-header">
+        <div>
+            <span class="eyebrow">TASKS</span>
+            <h1 class="page-title">업무 관리</h1>
+            <p class="page-description">회의록에서 나에게 배정된 업무와 마감 기한을 확인하세요.</p>
+        </div>
+    </header>
+
+    {# 마감 임박 알림: 완료 체크 후 서버가 다시 그려준 HTML 로 교체된다 #}
+    <div id="taskAlert">{% include 'tasks/_task_alert.html' %}</div>
+
+    <section class="grid grid-3 mb-4" aria-label="업무 요약">
+        <div class="stat-card">
+            <div>
+                <p class="stat-label">진행 중인 내 업무</p>
+                <p class="stat-value" data-stat="open">{{ stats.open }}건</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div>
+                <p class="stat-label">마감 임박 / 지연</p>
+                <p class="stat-value{% if stats.urgent %} text-danger{% endif %}" data-stat="urgent">{{ stats.urgent }}건</p>
+                <p class="stat-note">{{ stats.urgent_days }}일 이내 마감 + 마감일 지남</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div>
+                <p class="stat-label">완료한 업무</p>
+                <p class="stat-value" data-stat="done">{{ stats.done }}건</p>
+            </div>
+        </div>
+    </section>
+
+    {# data-list-root: common.js 가 검색 입력/탭 클릭 시 [data-list-results] 영역만 새로 받아온다 #}
+    <section class="card" data-list-root id="taskListRoot">
+        <div class="list-toolbar">
+            <nav class="tabs" role="tablist" aria-label="업무 구분">
+                <a class="tab{% if tab == 'open' %} is-active{% endif %}" href="?tab=open" role="tab"
+                   data-list-tab="open" aria-selected="{% if tab == 'open' %}true{% else %}false{% endif %}">진행 중</a>
+                <a class="tab{% if tab == 'done' %} is-active{% endif %}" href="?tab=done" role="tab"
+                   data-list-tab="done" aria-selected="{% if tab == 'done' %}true{% else %}false{% endif %}">완료</a>
+            </nav>
+
+            <form class="search-field" method="GET" role="search" data-list-search>
+                <input type="hidden" name="tab" value="{{ tab }}">
+                <span class="search-icon" aria-hidden="true">⌕</span>
+                <input type="search" name="q" value="{{ q }}" placeholder="업무, 프로젝트, 회의록 또는 #해시태그"
+                       aria-label="업무 검색" autocomplete="off">
+            </form>
+        </div>
+
+        <div data-list-results aria-live="polite">
+            {% include 'tasks/_task_items.html' %}
+        </div>
+    </section>
+
+{% endblock %}
+
+{% block script %}
+<script>
+    /* 완료 체크: 서버에 저장 -> 요약 숫자·마감 알림 갱신 -> 목록 다시 받기(체크한 업무가 현재 탭에서 빠짐) */
+    const taskListRoot = document.getElementById('taskListRoot');
+
+    function refreshTaskList() {
+        // initLiveList(common.js) 가 검색 폼 submit 을 받아 현재 탭/검색어로 목록을 다시 불러온다
+        taskListRoot.querySelector('[data-list-search]').requestSubmit();
+    }
+
+    taskListRoot.addEventListener('change', async (e) => {
+        const checkbox = e.target.closest('[data-task-complete]');
+        if (!checkbox) return;
+
+        checkbox.disabled = true;
+        const data = new FormData();
+        data.append('complete', checkbox.checked ? 'Y' : 'N');
+        const { ok, status, data: result } = await postForm(checkbox.dataset.taskComplete, data);
+
+        if (status === 401) {
+            window.location.href = result.redirect_url || window.location.href;
+            return;
+        }
+        if (!ok) {
+            checkbox.checked = !checkbox.checked;  // 실패하면 원래대로
+            checkbox.disabled = false;
+            alert(result.message || '업무 상태를 바꾸지 못했습니다.');
+            return;
+        }
+
+        document.querySelector('[data-stat="open"]').textContent = result.stats.open + '건';
+        document.querySelector('[data-stat="done"]').textContent = result.stats.done + '건';
+        const urgent = document.querySelector('[data-stat="urgent"]');
+        urgent.textContent = result.stats.urgent + '건';
+        urgent.classList.toggle('text-danger', result.stats.urgent > 0);
+        document.getElementById('taskAlert').innerHTML = result.alert_html;
+        document.querySelectorAll('[data-sidebar-task-count]').forEach((el) => {
+            el.textContent = String(result.stats.open).padStart(2, '0');
+        });
+        refreshTaskList();
+    });
+</script>
+{% endblock %}

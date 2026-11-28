@@ -100,7 +100,8 @@
             </div>
 
             <div class="form-group">
-                <label class="form-label" for="files">첨부파일</label>
+                <label class="form-label" for="files">첨부파일 (프로젝트 개요)</label>
+                <p class="form-hint">프로젝트 계획서처럼 프로젝트 전체의 기반이 되는 문서를 올려 주세요. 목표·주요 기능·역할 분담·일정이 담겨 있으면 AI 가 회의록을 정리하고 업무를 만들 때 기준으로 참고합니다. (docx, pptx, xlsx, pdf, hwpx 를 읽을 수 있어요)</p>
 
                 {% if project_files %}
                     {# 수정: 기존 첨부파일. 체크하면 저장할 때 삭제된다 (remove_file_ids) #}
@@ -277,7 +278,8 @@
             size.textContent = formatSize(file.size);
             const remove = document.createElement('button');
             remove.type = 'button';
-            remove.className = 'file-remove';
+            remove.className = 'user-chip-remove';  // 참여자 칩의 ✕ 와 같은 스타일
+            remove.dataset.fileRemove = '';
             remove.dataset.index = index;
             remove.setAttribute('aria-label', file.name + ' 첨부 취소');
             remove.textContent = '✕';
@@ -302,7 +304,7 @@
     });
 
     filePreview.addEventListener('click', (e) => {
-        const button = e.target.closest('.file-remove');
+        const button = e.target.closest('[data-file-remove]');
         if (!button) return;
         selectedFiles.splice(Number(button.dataset.index), 1);
         syncFileInput();

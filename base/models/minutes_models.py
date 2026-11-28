@@ -26,7 +26,20 @@ class Minutes(models.Model):
         verbose_name='프로젝트'
     )
     title = models.CharField('회의록명', max_length=2000, blank=False, null=False)
-    content = models.TextField('회의록 내용', blank=False, null=False)
+    content = models.TextField('회의록 내용', blank=True, null=False, default='')  # 선택 입력. 있으면 AI 정리에 메모로 사용
+
+    # AI 분석 (음성파일 -> Clova Speech 텍스트 변환 -> Claude 회의 정리 + 업무 추출). base/ai/pipeline.py
+    AI_STATUS_CHOICES = [
+        ('N', '분석 안 함'),
+        ('W', '분석 대기'),
+        ('R', '분석 중'),
+        ('D', '분석 완료'),
+        ('F', '분석 실패'),
+    ]
+    ai_status = models.CharField('AI 분석 상태', max_length=1, choices=AI_STATUS_CHOICES, default='N')
+    ai_message = models.CharField('AI 분석 메시지', max_length=1000, blank=True, null=True)
+    transcript = models.TextField('음성 변환 원문', blank=True, null=True)
+    summary = models.TextField('AI 회의 정리', blank=True, null=True)
 
     created_at = models.DateTimeField('생성일시', auto_now_add=True)
     updated_at = models.DateTimeField('수정일시', auto_now=True)
@@ -68,8 +81,8 @@ class Minutes(models.Model):
 
 class MinutesFile(models.Model):
     DOC_TYPE_CHOICES = [
-        ('0', '회의록 첨부파일'),
-        ('1', '음성파일'),
+        ('0', '회의 자료'),   # 회의에 사용한 문서 (doc, ppt, excel, pdf 등)
+        ('1', '음성파일'),    # 원본 녹음. AI 정리 결과는 Minutes.summary 에 저장
     ]
 
     minutes = models.ForeignKey(

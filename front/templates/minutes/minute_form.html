@@ -29,13 +29,15 @@
             {% else %}
                 <span class="eyebrow">NEW MINUTES</span>
                 <h1 class="page-title">새 회의록 생성</h1>
-                <p class="page-description">'{{ project.title }}' 프로젝트에 회의록을 추가합니다.</p>
+                <p class="page-description">'{{ project.title }}' 프로젝트에 회의록을 추가합니다. 음성파일을 올리면 AI 가 회의 내용을 정리하고 업무 목록을 만들어 줍니다.</p>
             {% endif %}
         </div>
     </header>
 
     <form class="card form-card" id="minutesForm" action="{{ action_url }}"
-          data-audio-max-size="{{ audio_max_size }}" data-audio-extensions="{{ audio_extensions }}" novalidate>
+          data-audio-max-size="{{ audio_max_size }}" data-audio-extensions="{{ audio_extensions }}"
+          data-document-max-size="{{ document_max_size }}" data-document-max-count="{{ document_max_count }}"
+          data-document-extensions="{{ document_extensions }}" novalidate>
         {% csrf_token %}
         <div class="stack">
             <div class="alert alert-danger" role="alert" data-form-alert hidden></div>
@@ -48,14 +50,45 @@
             </div>
 
             <div class="form-group">
-                <label class="form-label" for="content">회의 내용 <span class="required-mark">*</span></label>
-                <textarea class="textarea" id="content" name="content" rows="14" required
-                          placeholder="회의에서 논의된 안건과 결정 사항을 입력해 주세요.">{{ minutes.content|default:'' }}</textarea>
+                <label class="form-label" for="content">회의 내용 <span class="text-muted">(선택)</span></label>
+                <textarea class="textarea" id="content" name="content" rows="10"
+                          placeholder="논의된 안건, 결정 사항, 맡은 일 등을 적어 주세요. 입력한 내용은 AI 가 회의를 정리하고 업무를 만들 때 음성보다 우선해서 참고합니다.">{{ minutes.content|default:'' }}</textarea>
                 <p class="form-error" data-error-for="content" hidden></p>
             </div>
 
             <div class="form-group">
-                <label class="form-label" for="audio">회의 음성파일</label>
+                <label class="form-label" for="documents">회의 자료 <span class="text-muted">(선택)</span></label>
+                <p class="form-hint">회의에서 함께 본 문서(기획서, 발표자료, 일정표 등)를 올리면 AI 가 용어와 담당 업무를 더 정확하게 파악합니다.</p>
+
+                {% if document_files %}
+                    {# 수정: 기존 회의 자료. 체크하면 저장할 때 삭제된다 (remove_file_ids) #}
+                    <ul class="file-list">
+                        {% for file in document_files %}
+                            <li>
+                                <span class="file-icon" aria-hidden="true">▤</span>
+                                <span class="file-name">{{ file.name }}</span>
+                                <span class="text-muted">{{ file.size|filesizeformat }}</span>
+                                <label class="form-check">
+                                    <input type="checkbox" name="remove_file_ids" value="{{ file.id }}" data-existing-document>
+                                    <span>삭제</span>
+                                </label>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+
+                <div class="file-drop" data-file-drop>
+                    <input type="file" id="documents" name="documents" multiple accept="{{ document_extensions }}">
+                    <span class="file-drop-icon" aria-hidden="true">▤</span>
+                    <span class="file-drop-title">문서를 끌어다 놓거나 <b>클릭해서 선택</b></span>
+                    <span class="file-drop-hint">docx, pptx, xlsx, pdf, hwpx, txt 등 · {% if document_files %}기존 파일 포함 {% endif %}최대 {{ document_max_count }}개 · 파일당 {{ document_max_size|filesizeformat }}</span>
+                </div>
+                <ul class="file-list" id="documentPreview" hidden></ul>
+                <p class="form-error" data-error-for="documents" hidden></p>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="audio">회의 음성파일 <span class="text-muted">(선택)</span></label>
 
                 {% if audio_files %}
                     {# 수정: 기존 음성파일. 체크하면 삭제, 새 파일을 고르면 교체된다 #}
@@ -78,12 +111,12 @@
                     <input type="file" id="audio" name="audio" accept="{{ audio_extensions }},audio/*">
                     <span class="file-drop-icon" aria-hidden="true">♪</span>
                     <span class="file-drop-title" id="audioTitle">음성파일을 끌어다 놓거나 <b>클릭해서 선택</b></span>
-                    <span class="file-drop-hint" id="audioHint">mp3, m4a, wav, webm, ogg, aac, flac · 최대 {{ audio_max_size|filesizeformat }}{% if audio_files %} · 새 파일을 고르면 기존 파일과 교체돼요{% endif %}</span>
+                    <span class="file-drop-hint" id="audioHint">mp3, m4a, wav, webm, ogg, aac, flac · 최대 {{ audio_max_size|filesizeformat }}{% if audio_files %} · 새 파일을 고르면 기존 파일과 교체되고 다시 분석해요{% endif %}</span>
                 </div>
                 <p class="form-error" data-error-for="audio" hidden></p>
             </div>
 
-            <!-- 음성파일 업로드 진행률 (전송 중에만 표시) -->
+            <!-- 파일 업로드 진행률 (전송 중에만 표시) -->
             <div class="form-group" id="uploadProgress" hidden>
                 <div class="progress"><div class="progress-bar" id="uploadProgressBar"></div></div>
                 <p class="form-hint text-right" id="uploadProgressText">0%</p>
@@ -102,7 +135,7 @@
 
 {% block script %}
 <script>
-    /* 회의록 생성/수정: 입력값·음성파일 확인 후 form action(createAction/updateAction)으로 전송 (common.js submitForm) */
+    /* 회의록 생성/수정: 입력값·회의 자료·음성파일 확인 후 form action(createAction/updateAction)으로 전송 (common.js submitForm) */
     const minutesForm = document.getElementById('minutesForm');
     const audioInput = document.getElementById('audio');
     const audioTitle = document.getElementById('audioTitle');
@@ -111,6 +144,12 @@
     const audioHintDefault = audioHint.textContent;
     const audioMaxSize = Number(minutesForm.dataset.audioMaxSize);
     const audioExtensions = minutesForm.dataset.audioExtensions.split(',');
+
+    const documentInput = document.getElementById('documents');
+    const documentPreview = document.getElementById('documentPreview');
+    const documentMaxSize = Number(minutesForm.dataset.documentMaxSize);
+    const documentMaxCount = Number(minutesForm.dataset.documentMaxCount);
+    const documentExtensions = minutesForm.dataset.documentExtensions.split(',');
 
     const progressBox = document.getElementById('uploadProgress');
     const progressBar = document.getElementById('uploadProgressBar');
@@ -122,45 +161,123 @@
         return bytes + 'B';
     }
 
-    function validateAudio(file) {
-        const dot = file.name.lastIndexOf('.');
-        const ext = dot >= 0 ? file.name.slice(dot).toLowerCase() : '';
-        if (!audioExtensions.includes(ext)) {
-            return '음성파일은(는) ' + audioExtensions.map((e) => e.slice(1)).join(', ') + ' 형식만 첨부할 수 있습니다. (' + file.name + ')';
+    function fileExt(name) {
+        const dot = name.lastIndexOf('.');
+        return dot >= 0 ? name.slice(dot).toLowerCase() : '';
+    }
+
+    function validateUpload(file, extensions, maxSize, label) {
+        if (!extensions.includes(fileExt(file.name))) {
+            return label + '은(는) ' + extensions.map((e) => e.slice(1)).join(', ') + ' 형식만 첨부할 수 있습니다. (' + file.name + ')';
         }
-        if (file.size > audioMaxSize) {
-            return '음성파일은(는) ' + formatSize(audioMaxSize) + ' 이하만 첨부할 수 있습니다. (' + file.name + ')';
+        if (file.size > maxSize) {
+            return label + '은(는) ' + formatSize(maxSize) + ' 이하만 첨부할 수 있습니다. (' + file.name + ')';
         }
         return null;
     }
 
-    function validateMinutesForm(form) {
-        const errors = {};
-        if (!form.elements.title.value.trim()) errors.title = '회의록 제목을 입력해 주세요.';
-        if (!form.elements.content.value.trim()) errors.content = '회의 내용을 입력해 주세요.';
-        const file = audioInput.files[0];
-        if (file) {
-            const audioError = validateAudio(file);
-            if (audioError) errors.audio = audioError;
-        }
-        return errors;
+    function showFieldError(name, message) {
+        const box = minutesForm.querySelector('[data-error-for="' + name + '"]');
+        box.textContent = message || '';
+        box.hidden = !message;
     }
+
+    /* ---------- 회의 자료 (여러 개, 행마다 X 로 빼기) ---------- */
+
+    // input.files 는 직접 고칠 수 없어서 이 배열을 기준으로 DataTransfer 로 다시 채운다.
+    // 다시 고르면 기존 선택에 추가되고, 같은 파일(이름·크기·수정시각)은 한 번만 들어간다.
+    let selectedDocuments = [];
+
+    function fileKey(file) {
+        return file.name + '|' + file.size + '|' + file.lastModified;
+    }
+
+    function keptDocumentCount() {
+        const boxes = minutesForm.querySelectorAll('input[data-existing-document]');
+        return Array.from(boxes).filter((box) => !box.checked).length;
+    }
+
+    function validateDocuments() {
+        if (keptDocumentCount() + selectedDocuments.length > documentMaxCount) {
+            return '회의 자료는 기존 파일을 포함해 최대 ' + documentMaxCount + '개까지 올릴 수 있습니다.';
+        }
+        for (const file of selectedDocuments) {
+            const error = validateUpload(file, documentExtensions, documentMaxSize, '회의 자료');
+            if (error) return error;
+        }
+        return null;
+    }
+
+    function syncDocumentInput() {
+        const dt = new DataTransfer();
+        selectedDocuments.forEach((file) => dt.items.add(file));
+        documentInput.files = dt.files;
+    }
+
+    function renderDocumentPreview() {
+        documentPreview.replaceChildren(...selectedDocuments.map((file, index) => {
+            const li = document.createElement('li');
+            const name = document.createElement('span');
+            name.className = 'file-name';
+            name.textContent = file.name;
+            const size = document.createElement('span');
+            size.className = 'text-muted';
+            size.textContent = formatSize(file.size);
+            const remove = document.createElement('button');
+            remove.type = 'button';
+            remove.className = 'user-chip-remove';  // 참여자 칩의 ✕ 와 같은 스타일
+            remove.dataset.fileRemove = '';
+            remove.dataset.index = index;
+            remove.setAttribute('aria-label', file.name + ' 첨부 취소');
+            remove.textContent = '✕';
+            li.append(name, size, remove);
+            if (validateUpload(file, documentExtensions, documentMaxSize, '회의 자료')) li.classList.add('is-invalid');
+            return li;
+        }));
+        documentPreview.hidden = selectedDocuments.length === 0;
+        showFieldError('documents', validateDocuments());
+    }
+
+    documentInput.addEventListener('change', () => {
+        const keys = new Set(selectedDocuments.map(fileKey));
+        Array.from(documentInput.files).forEach((file) => {
+            if (!keys.has(fileKey(file))) {
+                keys.add(fileKey(file));
+                selectedDocuments.push(file);
+            }
+        });
+        syncDocumentInput();
+        renderDocumentPreview();
+    });
+
+    documentPreview.addEventListener('click', (e) => {
+        const button = e.target.closest('[data-file-remove]');
+        if (!button) return;
+        selectedDocuments.splice(Number(button.dataset.index), 1);
+        syncDocumentInput();
+        renderDocumentPreview();
+    });
+
+    // (수정 화면) 기존 자료 삭제 체크를 바꾸면 개수 제한 다시 확인
+    minutesForm.querySelectorAll('input[data-existing-document]').forEach((box) => {
+        box.addEventListener('change', () => showFieldError('documents', validateDocuments()));
+    });
+
+    /* ---------- 음성파일 (1개) ---------- */
 
     // 파일을 고르면 바로 검사하고, 드롭존에 선택한 파일 이름/크기를 보여준다
     audioInput.addEventListener('change', () => {
         const file = audioInput.files[0];
-        const errorBox = minutesForm.querySelector('[data-error-for="audio"]');
-        errorBox.hidden = true;
+        showFieldError('audio', null);
 
         if (!file) {
             audioTitle.innerHTML = audioTitleDefault;
             audioHint.textContent = audioHintDefault;
             return;
         }
-        const audioError = validateAudio(file);
+        const audioError = validateUpload(file, audioExtensions, audioMaxSize, '음성파일');
         if (audioError) {
-            errorBox.textContent = audioError;
-            errorBox.hidden = false;
+            showFieldError('audio', audioError);
             audioTitle.innerHTML = audioTitleDefault;
             audioHint.textContent = audioHintDefault;
         } else {
@@ -169,6 +286,21 @@
         }
     });
 
+    /* ---------- 전송 ---------- */
+
+    function validateMinutesForm(form) {
+        const errors = {};
+        if (!form.elements.title.value.trim()) errors.title = '회의록 제목을 입력해 주세요.';
+        const file = audioInput.files[0];
+        if (file) {
+            const audioError = validateUpload(file, audioExtensions, audioMaxSize, '음성파일');
+            if (audioError) errors.audio = audioError;
+        }
+        const documentError = validateDocuments();
+        if (documentError) errors.documents = documentError;
+        return errors;
+    }
+
     function updateProgress(percent) {
         progressBar.style.width = percent + '%';
         progressText.textContent = percent < 100 ? '업로드 중 ' + percent + '%' : '저장 중...';
@@ -176,13 +308,13 @@
 
     minutesForm.addEventListener('submit', (e) => {
         e.preventDefault();
-        const hasAudio = audioInput.files.length > 0;
+        const hasFiles = audioInput.files.length > 0 || documentInput.files.length > 0;
 
         submitForm(minutesForm, {
             url: minutesForm.action,
             validate: validateMinutesForm,
-            busyText: hasAudio ? '업로드 중...' : '저장 중...',
-            onProgress: hasAudio ? (percent) => {
+            busyText: hasFiles ? '업로드 중...' : '저장 중...',
+            onProgress: hasFiles ? (percent) => {
                 progressBox.hidden = false;
                 updateProgress(percent);
             } : null,
